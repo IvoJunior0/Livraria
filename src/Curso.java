@@ -23,6 +23,8 @@ public class Curso {
      * nomeCurso = "Meio Ambiente";
      * this.codigo = "MEA";
      * 
+     * @param nomeCurso Nome do curso.
+     * 
      * @return String - Codigo do curso formatado.
      */
     private String gerarCodigo(String nomeCurso) {

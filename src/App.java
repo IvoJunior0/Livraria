@@ -7,13 +7,10 @@ import java.time.LocalDate;
 public class App {
     public static Scanner scanner = new Scanner(System.in);
     public static boolean logado = false;
+
     public static void main(String[] args) throws Exception {
         // Objetos principais do sistema.
 
-        // Os codigo serão usados como indexes dessa ArrayList.
-        ArrayList<Usuario> usuariosCadastrados = new ArrayList<Usuario>();
-        Usuario usuarioLogado = new Usuario();
-        Usuario user = new Usuario();
         List<Curso> cursos = Arrays.asList(
             new Curso("Informática", "Técnico Integrado"),
             new Curso("Meio Ambiente", "Técnico Integrado"),
@@ -27,6 +24,15 @@ public class App {
             new Curso("Matemática", "Licenciatura"),
             new Curso("Biologia", "Licenciatura")
         );
+
+        ArrayList<Usuario> usuariosCadastrados = new ArrayList<>(
+            Arrays.asList(
+                // Usuário estático para testes e afins.
+                new Usuario("Ivo dos Santos Soares Junior", cursos.get(0), "12345678")
+            )
+        ); // Os codigo dos usuários serão usados como indexes.
+        Usuario usuarioLogado = new Usuario();
+        
         Livro livro1 = new Livro(
                          "Capitães da areia", 
                           "Jorge Amado", 
@@ -37,8 +43,9 @@ public class App {
                          "A hora da estrela", 
                           "Clarice Lispector", 
                          "Edição comemorativa", 
-                            2020, 
+                            2020,
                   88);
+
         Exemplar exemplar1 = new Exemplar(livro1); // Exemplar de "Capitaes da areia".
         Exemplar exemplar2 = new Exemplar(livro2); // Exemplar de "A hora da estrela".
 
@@ -52,10 +59,10 @@ public class App {
         System.out.println("   | |    | | | | |  __/   | |_) | | (_) | | (_) | |   <  | |      | (_| | | (__  |  __/");
         System.out.println("   |_|    |_| |_|  \\___|   |____/   \\___/   \\___/  |_|\\_\\ |_|       \\__,_|  \\___|  \\___|");
         System.out.println("=========================================================================================");
-        System.out.println("A melhor livraria online de Açailândia.");
+        System.out.println("Por Ivo Jr.");
 
         // Programa principal.
-        while (opcaoMenu != 5) {
+        while (opcaoMenu != 7) {
             System.out.println("\n1. Fazer cadastro");
             System.out.println("2. Login");
             System.out.println("3. Alterar dados do usuário");
@@ -70,12 +77,8 @@ public class App {
             switch (opcaoMenu) {
                 // Cadastro de usuário
                 case 1:
-                    if (user.getCodigo() != -1) {
-                        System.out.println("\nUsuário já foi cadastrado.");
-                        break;
-                    }
-
                     // Variáveis usadas para passar como parametros no cadastro do usuário.
+                    Usuario user = new Usuario();
                     String usuarioNome, usuarioSenha;
                     Curso cursoEscolhido;
 
@@ -99,39 +102,62 @@ public class App {
                 case 2:
                     if (logado) {
                         System.out.println("Você já está logado. Deseja sair de sua conta? (S/n)");
-                    }
-                    String nomeLogin, senhaLogin;
+                        char sairOpcao= ' ';
+                        do {
+                            sairOpcao = scanner.next().charAt(0);
+                            if (sairOpcao != 'S' && sairOpcao != 'n') {
+                                System.out.println("Opção inválida. Digita novamente.");
+                            }
+                        } while (sairOpcao != 'S' && sairOpcao != 'n');
 
-                    System.out.println("Nome:");
-                    nomeLogin = scanner.nextLine();
-                    System.out.println("Senha:");
-                    senhaLogin = validarSenha(8);
-
-                    for (Usuario usuario : usuariosCadastrados) {
-                        if (usuario.getNome().equals(nomeLogin) && usuario.verificaSenha(senhaLogin)) {
-                            usuarioLogado = usuario;
-                            logado = true;
+                        // Até chegar ele terá digitado ou 'S' ou 'n', obrigatoriamente.
+                        if (sairOpcao == 'n') {
                             break;
                         }
+                        logado = false;
                     }
 
-                    if (!logado) {
-                        
+                    while (!logado) {
+                        String matriculaLogin, senhaLogin;
+    
+                        System.out.println("\nMatricula:");
+                        matriculaLogin = scanner.nextLine();
+                        System.out.println("\nSenha:");
+                        senhaLogin = validarSenha(8);
+    
+                        for (Usuario usuario : usuariosCadastrados) {
+                            if (usuario.getMatricula().equals(matriculaLogin) && usuario.verificaSenha(senhaLogin)) {
+                                usuarioLogado = usuario;
+                                logado = true;
+                                System.out.println("\nLogin feito com sucesso!");
+                                // Sepração em array do nome usando espaços como parâmetros.
+                                // [0] se refere ao primeiro nome do usuário.
+                                String primeiroNome = usuarioLogado.getNome().split("[\\s]")[0];
+                                System.out.printf("Bem-vindo, %s.\n", primeiroNome);
+                                break;
+                            }
+                        }
+    
+                        // Ele só entra nessa condição se não tiver encontrado nenhum usuário antes.
+                        if (!logado) {
+                            System.out.println("\nUsuário não encontrado:");
+                            System.out.println("Senha ou nome incorreto.");
+                        }
                     }
                     break;
 
                 // Alterar dados do usuário.
                 case 3:
-                    if (user.getCodigo() == -1) {
-                        System.out.println("\nUsuário não foi cadastrado.");
+                    if (!logado) {
+                        System.out.println("\nVocê precisa estar logado para acessar essa funcionalidade.");
                         break;
                     }
-                    String novoNome = user.getNome(), novaSenha = "";
-                    Curso novoCurso = user.getCurso();
+                    String novoNome = usuarioLogado.getNome(), novaSenha = "";
+                    Curso novoCurso = usuarioLogado.getCurso();
 
                     // Dados passíveis de alterações diretamente pelo usuário.
                     // Matricula e código serão lidadas pelo sistema.
-                    System.out.println("\n-> Dados alteraveis");
+                    System.out.println("\n-> Dados alteraveis:");
                     System.out.println("1. Nome");
                     System.out.println("2. Senha");
                     System.out.println("3. Curso");
@@ -143,30 +169,48 @@ public class App {
                             System.out.println("\nEscolha um novo nome:");
                             novoNome = scanner.nextLine();
 
-                            user.cadastrarUsuario(novoNome, novoCurso);
+                            usuarioLogado.cadastrarUsuario(novoNome, novoCurso);
                             break;
                         case 2: // Senha
                             System.out.println("\nNova senha:");
                             novaSenha = validarSenha(8);
 
-                            user.cadastrarUsuario(novoNome, novoCurso, novaSenha);
+                            usuarioLogado.cadastrarUsuario(novoNome, novoCurso, novaSenha);
                             break;
                         case 3: // Curso
                             imprimirListaCursos(cursos);
                             System.out.println("Selecione seu curso:");
                             novoCurso = validarCurso(cursos);
 
-                            user.cadastrarUsuario(novoNome, novoCurso);
+                            usuarioLogado.cadastrarUsuario(novoNome, novoCurso);
                             break;
                         default:
                             break;
                     }
                     break;
+                
+                // Fazer emprestimo.
                 case 4:
+                    if (!logado) {
+                        System.out.println("\nVocê precisa estar logado para acessar essa funcionalidade.");
+                        break;
+                    }
                     break;
+                
+                // Dados do emprestimo.
                 case 5:
+                    if (!logado) {
+                        System.out.println("\nVocê precisa estar logado para acessar essa funcionalidade.");
+                        break;
+                    }
                     break;
+
+                // Fazer devolução.
                 case 6:
+                    if (!logado) {
+                        System.out.println("\nVocê precisa estar logado para acessar essa funcionalidade.");
+                        break;
+                    }
                     break;
                 case 7:
                     break;
@@ -177,14 +221,19 @@ public class App {
         }
 
         // Ao sair do projeto.
-        System.out.println("\nObrigado e volte sempre!");
+        System.out.println("Obrigado e volte sempre!");
     }
 
+    /**
+     * Imprimir uma lista dos atributos (visíveis do usuário).
+     * Senha e código não são mostrados por (obviamente) questões de seguranção.
+     *  
+     * @param usuario Usuários para ter os dados impressos.
+     */
     public static void imprimirDadosUsuario(Usuario usuario) {
         System.out.printf("\nNome: %s\n", usuario.getNome());
         System.out.printf("Matricula: %s\n", usuario.getMatricula());
         System.out.printf("Curso: %s (%s)\n", usuario.getCurso().getNome(), usuario.getCurso().getModalidade());
-        System.out.println("Codigo: " + usuario.getCodigo());
     }
 
     /**
@@ -195,7 +244,7 @@ public class App {
      * 2º coluna: Nome do curso. (24 digitos)
      * 3º coluna: Modalidade do curso. (28 digitos)
      * 
-     * @param lista List<Curso> - Lista de cursos disponíveis. 
+     * @param lista Lista de cursos disponíveis. 
      */
     public static void imprimirListaCursos(List<Curso> lista) {
         System.out.println("\n+----+--------------------------+------------------------------+");
@@ -212,7 +261,7 @@ public class App {
      * Função de validação de senhas.
      * Entra em loop enquanto a senha não tiver um tamanho mínimo aceito.
      * 
-     * @param tamanhoMinimoSenha - Numero minimo de caracteres que a senha deve ter.
+     * @param tamanhoMinimoSenha Numero minimo de caracteres que a senha deve ter.
      * @return String - Senha do usuário.
      */
     public static String validarSenha(int tamanhoMinimoSenha) {
@@ -230,7 +279,7 @@ public class App {
      * Função de validação da opção do curso.
      * Entra em loop enquanto a opção de curso não estiver dentro da lista de cursos.
      * 
-     * @param listaCursos List<Curso> - Lista de cursos disponíveis. 
+     * @param listaCursos Lista de cursos disponíveis. 
      * @return Curso - Curso do usuário.
      */
     public static Curso validarCurso(List<Curso> listaCursos) {
