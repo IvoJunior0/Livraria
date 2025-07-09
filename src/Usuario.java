@@ -17,9 +17,10 @@ public class Usuario {
     /**
      * Construtor de Usuario com parâmetros.
      * Usado para instância de contas estáticas do sistema.
-     * @param nome
-     * @param curso
-     * @param senha
+     * 
+     * @param nome Nome a ser cadastrado.
+     * @param curso Curso a ser cadastrado.
+     * @param senha Senha a ser cadastrada.
      */
     public Usuario(String nome, Curso curso, String senha) {
         this.codigo = ++Usuario.quantidadeUsuarios;
@@ -33,9 +34,9 @@ public class Usuario {
      * Função de cadastro de usuário.
      * Usada para cadastro, implementação de novos dados e atualização de atributos.
      * 
-     * @param nome
-     * @param curso
-     * @param senha
+     * @param nome Nome a ser cadastrado.
+     * @param curso Curso a ser cadastrado.
+     * @param senha Senha a ser cadastrada.
      */
     public void cadastrarUsuario(String nome, Curso curso, String senha) {
         this.codigo = ++Usuario.quantidadeUsuarios;

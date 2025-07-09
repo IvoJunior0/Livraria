@@ -7,4 +7,8 @@ public class Exemplar {
         this.status = "Livre";
         this.livro = livro;
     }
+
+    public Livro getLivro() {
+        return this.livro;
+    }
 }

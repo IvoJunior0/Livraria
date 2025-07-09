@@ -3,6 +3,13 @@ public class Curso {
     private String nome;
     private String modalidade;
 
+    /**
+     * Construtor da classe Curso.
+     * O código do curso é gerado automaticamente pela função gerarCodigo().
+     * 
+     * @param nome Nome completo do curso.
+     * @param modalidade Modalidade do curso.
+     */
     public Curso(String nome, String modalidade) {
         this.nome = nome;
         this.modalidade = modalidade;
