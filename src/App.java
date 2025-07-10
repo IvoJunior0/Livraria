@@ -80,22 +80,49 @@ public class App {
                     // Variáveis usadas para passar como parametros no cadastro do usuário.
                     Usuario user = new Usuario();
                     String usuarioNome, usuarioSenha;
+                    char confimarDados = ' ';
                     Curso cursoEscolhido;
 
-                    System.out.println("\nNome do usuário:");
-                    usuarioNome = scanner.nextLine();
-                    System.out.println("\nSenha do usuário:");
-                    usuarioSenha = validarSenha(8);
+                    while (true) {
+                        System.out.println("\nNome do usuário:");
+                        usuarioNome = scanner.nextLine();
+                        usuarioNome = capitalizarTexto(usuarioNome);
 
-                    imprimirListaCursos(cursos);
-                    System.out.println("Selecione seu curso:");
-                    cursoEscolhido = validarOpcaoLista(cursos);
+                        System.out.println("\nSenha do usuário:");
+                        usuarioSenha = validarSenha(8);
 
-                    user.cadastrarUsuario(usuarioNome, cursoEscolhido, usuarioSenha);
+                        imprimirListaCursos(cursos);
+                        System.out.println("Selecione seu curso:");
+                        cursoEscolhido = validarOpcaoLista(cursos);
 
-                    System.out.printf("Usuário %s cadastrado com sucesso!\n", user.getNome());
-                    imprimirDadosUsuario(user);
-                    usuariosCadastrados.add(user);
+                        System.out.println("\nUsuário a ser cadastrado:");
+                        System.out.printf("- Nome: %s\n", usuarioNome);
+                        System.out.printf("- Senha: %s\n", usuarioSenha);
+                        System.out.printf("- Curso: %s (%s)\n", cursoEscolhido.getNome(), cursoEscolhido.getModalidade());
+                        System.out.println("\nConfirmar dados: (S/n)");
+                        confimarDados = lerRespostaSimNao(confimarDados);
+
+                        // Se os dados estiverem corretos.
+                        if (confimarDados == 'S') {
+                            break;
+                        }
+
+                        System.out.println("Deseja cadastrar outros dados? (S/n)");
+                        confimarDados = lerRespostaSimNao(confimarDados);
+
+                        // Se não quiser cadastrar outros dados.
+                        if (confimarDados == 'n') {
+                            break;
+                        }
+                    }
+
+                    if (confimarDados == 'S') {                        
+                        user.cadastrarUsuario(usuarioNome, cursoEscolhido, usuarioSenha);
+    
+                        System.out.printf("Usuário %s cadastrado com sucesso!\n", user.getNome());
+                        imprimirDadosUsuario(user);
+                        usuariosCadastrados.add(user);
+                    }
                     break;
 
                 // Login
@@ -213,7 +240,7 @@ public class App {
                     /*
                      * Checando se o tamanho do valor dos atributos são maiores que o tamanho mínimo de cada coluna.
                      * Se for, o novo valores é atribuido ao tamanho da coluna.
-                     * A função max é usada para saber qual valor é maior dentre o tamanho mínimo e o valor do atributo.
+                     * O método max é usada para saber qual valor é maior dentre o tamanho mínimo e o valor do atributo.
                      */
                     for (Livro livro : livros) {
                         codColunaTamanho = Math.max(codColunaTamanho, String.valueOf(livro.getCodigo()).length());
@@ -295,7 +322,7 @@ public class App {
                                 exemplar.getStatus());
                     }
                     System.out.println(linhaHorizontal); // Linha final. +----+-----+------+------+
-                    Exemplar exemplarRequerido = null;
+                    Exemplar exemplarRequerido = null; // Referência ao exemplar escolhido, não uma cópia dele.
 
                     // Repetir até a pessoa escolher um livro disponível.
                     do {
@@ -354,6 +381,40 @@ public class App {
         System.out.printf("\nNome: %s\n", usuario.getNome());
         System.out.printf("Matricula: %s\n", usuario.getMatricula());
         System.out.printf("Curso: %s (%s)\n", usuario.getCurso().getNome(), usuario.getCurso().getModalidade());
+    }
+
+    /**
+     * Método de capitalização de textos.
+     * 
+     * O texto é dividido em palavras com base em espaços usando regex.
+     * Em seguida, cada palavra tem seu primeiro caractere convertido para maiúsculo e é
+     * concatenada ao resultado final.
+     * 
+     * Exemplo: "joão gabriel" torna-se "João Gabriel".
+     * 
+     * @param texto Texto a ser capitalizado.
+     * @return String - Texto capitalizado.
+     */
+    public static String capitalizarTexto(String texto) {
+        StringBuilder novoTexto = new StringBuilder(); // Evitar concatenação.
+        String[] palavras = texto.trim().split("\\s+");
+
+        for (int i = 0; i < palavras.length; i++) {
+            String palavra = palavras[i];
+            if (!palavra.isEmpty()) {
+                novoTexto.append(
+                    palavra.substring(0, 1).toUpperCase()
+                    + palavra.substring(1)
+                );
+                if (i < palavras.length - 1) {
+                    // Evitar que adicione espaço na última palavra
+                    // para que não fique "João Gabriel "
+                    novoTexto.append(" "); 
+                }
+            }
+        }
+
+        return novoTexto.toString();
     }
 
     /**

@@ -74,7 +74,7 @@ public class Usuario {
     private String gerarMatricula() {
         String matriculaCurso = this.curso.getCodigo();
         String matriculaID = String.format("%04d", this.codigo);
-        return matriculaCurso + matriculaID;
+        return "2025" + matriculaCurso + matriculaID;
     }
 
     /**
