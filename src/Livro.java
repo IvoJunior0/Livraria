@@ -6,7 +6,7 @@ public class Livro {
     private String edicao;
     private int ano;
     private int numeroPaginas;
-    private int estoque;
+    private int estoque = 0;
 
     /**
      * Construtor da classe Livro.
@@ -16,16 +16,18 @@ public class Livro {
      * @param edicao Edição do livro.
      * @param ano Ano de publicação da edição.
      * @param numeroPaginas Número de páginas totais da edição.
-     * @param estoque Estoque de exemplares disponíveis.
      */
-    public Livro(String titulo, String autor, String edicao, int ano, int numeroPaginas, int estoque) {
+    public Livro(String titulo, String autor, String edicao, int ano, int numeroPaginas) {
         this.codigo = ++quantidadeTotalLivros;
         this.titulo = titulo;
         this.autor = autor;
         this.edicao = edicao;
         this.ano = ano;
         this.numeroPaginas = numeroPaginas;
-        this.estoque = estoque;
+    }
+
+    public void atualizarEstoque(int quantidade) {
+        this.estoque += quantidade;
     }
 
     public static int getQuantidadeTotalLivros() {

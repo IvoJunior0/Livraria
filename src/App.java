@@ -1,16 +1,15 @@
 import java.util.Scanner;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.ArrayList;
-import java.time.LocalDate;
 
 public class App {
     public static Scanner scanner = new Scanner(System.in);
     public static boolean logado = false;
 
     public static void main(String[] args) throws Exception {
-        // Objetos principais do sistema.
-
         List<Curso> cursos = Arrays.asList(
                 new Curso("Informática", "Técnico Integrado"),
                 new Curso("Meio Ambiente", "Técnico Integrado"),
@@ -34,16 +33,22 @@ public class App {
         Usuario usuarioLogado = new Usuario();
 
         List<Livro> livros = Arrays.asList(
-                new Livro("Capitães da areia", "Jorge Amado", "Edição de bolso", 2009, 280, 1),
-                new Livro("A hora da estrela", "Clarice Lispector", "Edição comemorativa", 2020, 88, 1));
+                new Livro("Capitães da areia", "Jorge Amado", "Edição de bolso", 2009, 280),
+                new Livro("A hora da estrela", "Clarice Lispector", "Edição comemorativa", 2020, 88));
 
-        // List<Exemplar> exemplares = Arrays.asList(
-        // new Exemplar(livros.get(0)), // Exemplar de "Capitaes da areia".
-        // new Exemplar(livros.get(1)) // Exemplar de "A hora da estrela".
-        // );
+        List<Exemplar> exemplares = Arrays.asList(
+            new Exemplar(livros.get(0)), // Exemplar de "Capitaes da areia".
+            new Exemplar(livros.get(0)), 
+            new Exemplar(livros.get(1)) // Exemplar de "A hora da estrela".
+        );
+
+        // HashMap da lista de emprestimos relacionados aos usuários.
+        // Usado para verficações e coleta de dados rápidas (em O(1)).
+        Map<Usuario, Emprestimo> emprestimos = new HashMap<>();
 
         int opcaoMenu = 0;
 
+        // Tela de Bem-vindos.
         System.out.println("=========================================================================================");
         System.out.println(" _______   _                ____                    _      ______                       ");
         System.out.println("|__   __| | |              |  _ \\                  | |    |  ____|                      ");
@@ -107,6 +112,7 @@ public class App {
                         logado = false;
                     }
 
+                    // Usuário continuará deslogado enquanto as credenciais estiverem erradas
                     while (!logado) {
                         String matriculaLogin, senhaLogin;
 
@@ -115,6 +121,7 @@ public class App {
                         System.out.println("\nSenha:");
                         senhaLogin = scanner.nextLine();
 
+                        // Busca por credienciais na lista de usuários do sistema.
                         for (Usuario usuario : usuariosCadastrados) {
                             if (usuario.getMatricula().equals(matriculaLogin) && usuario.verificaSenha(senhaLogin)) {
                                 usuarioLogado = usuario;
@@ -194,18 +201,21 @@ public class App {
                     int opcaoLivro;
                     char escolherLivroOpcao = ' ';
 
-                    // Tabela de livros cadastrados no sistema para visualização clara pro usuário.
+                    // Tabela de livros cadastrados no sistema.
+                    // Código - Tìtulo (Autor) - Edição - Número de páginas - Estoque
                     // Calculo do tamanho mínimo de cada coluna da tabela.
                     int codColunaTamanho = "Código".length();
                     int tituloAutorColunaTamanho = "Título (Autor)".length();
                     int edicaoAnoColunaTamanho = "Edição (Ano)".length();
                     int paginasColunaTamanho = "Nº de Páginas".length();
-                    int estoqueColunaTamanho = "Quantidade".length();
+                    int estoqueColunaTamanho = "Estoque".length();
 
+                    /*
+                     * Checando se o tamanho do valor dos atributos são maiores que o tamanho mínimo de cada coluna.
+                     * Se for, o novo valores é atribuido ao tamanho da coluna.
+                     * A função max é usada para saber qual valor é maior dentre o tamanho mínimo e o valor do atributo.
+                     */
                     for (Livro livro : livros) {
-                        // Checando se o tamanho dos atributos são maiores que o tamanho mínimo de cada
-                        // coluna.
-                        // Se for, o novo valores é atribuido ao tamanho da coluna.
                         codColunaTamanho = Math.max(codColunaTamanho, String.valueOf(livro.getCodigo()).length());
                         tituloAutorColunaTamanho = Math.max(tituloAutorColunaTamanho,
                                 (livro.getTitulo() + " (" + livro.getAutor() + ")").length());
@@ -226,13 +236,14 @@ public class App {
                             "-".repeat(paginasColunaTamanho + 2) + "+" +
                             "-".repeat(estoqueColunaTamanho + 2) + "+"; // + 2 são as margens horizontais das colunas.
 
-                    // Imprimir o cabeçalho da tabela.
+                    // Imprimir o cabeçalho da tabela de livros.
+                    System.out.println("\nLivros disponíveis:");
                     System.out.println('\n' + linhaHorizontal); // +----+-----+------+------+
                     System.out.printf(
                             "| %-" + codColunaTamanho + "s | %-" + tituloAutorColunaTamanho + "s | %-"
                                     + edicaoAnoColunaTamanho + "s | %-" + paginasColunaTamanho + "s | %-"
                                     + estoqueColunaTamanho + "s |\n",
-                            "Código", "Título (Autor)", "Edição (Ano)", "Nº de Páginas", "Quantidade");
+                            "Código", "Título (Autor)", "Edição (Ano)", "Nº de Páginas", "Estoque");
                     System.out.println(linhaHorizontal); // +----+-----+------+------+
 
                     // Imprimir as linhas dos livros.
@@ -249,21 +260,61 @@ public class App {
                     }
                     System.out.println(linhaHorizontal); // Linha final. +----+-----+------+------+
 
-                    // TODO: imprimir lista de exemplares. mostrar qm tá com o livro, o codigo, o livro e essas coisas
+                    // Lista de exemplares.
+                    // Código - Tìtulo do exemplar - Status
+                    int colunaTituloTamanho = "Título".length();
+                    int colunaStatusTamanho = "Status".length();
 
-                    System.out.println("Qual livro você deseja pegar? (Digite o código do livro)");
-                    Livro livroRequerido = validarOpcaoLista(livros);
-
-                    // Checar se tá disponível.
-                    if (livroRequerido.getEstoque() == 0) {
-                        System.out.println("Livro não disponível. Deseja escolher outro? (S/n)");
-                        escolherLivroOpcao = lerRespostaSimNao(escolherLivroOpcao);
+                    for (Exemplar exemplar : exemplares) {
+                        colunaTituloTamanho = Math.max(colunaTituloTamanho, String.valueOf(exemplar.getLivro().getTitulo()).length());
+                        colunaStatusTamanho = Math.max(colunaStatusTamanho, exemplar.getStatus().length());
                     }
+
+                    // Atualizando o layout da linha horizontal para lista de exemplares.
+                    linhaHorizontal = "+" + 
+                                "-".repeat(codColunaTamanho + 2) + "+" +
+                                "-".repeat(colunaTituloTamanho + 2) + "+" +
+                                "-".repeat(colunaStatusTamanho + 2) + "+";
                     
-                    if (escolherLivroOpcao == 'n') {
-                        break;
+                    // Imprimir cabeçalho da lista de exemplares.
+                    System.out.println("\nExemplares:");
+                    System.out.println('\n' + linhaHorizontal); // +----+-----+------+------+
+                    System.out.printf(
+                            "| %-" + codColunaTamanho + "s | %-" + colunaTituloTamanho + "s | %-"
+                                    + colunaStatusTamanho + "s |\n",
+                            "Código", "Título", "Status");
+                    System.out.println(linhaHorizontal); // +----+-----+------+------+
+
+                    // Imprimir as linhas dos exemplares.
+                    for (Exemplar exemplar : exemplares) {
+                        System.out.printf(
+                                "| %-" + codColunaTamanho + "s | %-" + colunaTituloTamanho + "s | %-"
+                                        + colunaStatusTamanho + "s |\n",
+                                exemplar.getCodigo(),
+                                exemplar.getLivro().getTitulo(),
+                                exemplar.getStatus());
                     }
-                    // opcaoLivro index na lista de livros
+                    System.out.println(linhaHorizontal); // Linha final. +----+-----+------+------+
+                    Exemplar exemplarRequerido = null;
+
+                    // Repetir até a pessoa escolher um livro disponível.
+                    do {
+                        System.out.println("Qual exemplar você deseja? (Digite o código)");
+                        exemplarRequerido = validarOpcaoLista(exemplares);
+                        
+                        // Checar se tá disponível.
+                        if (exemplarRequerido.getStatus() != "Livre") {
+                            System.out.println("\nLivro indisponível. Deseja escolher outro? (S/n)");
+                            escolherLivroOpcao = lerRespostaSimNao(escolherLivroOpcao);
+                        }
+                        
+                        if (escolherLivroOpcao == 'n') {
+                            break;
+                        }
+                    } while (escolherLivroOpcao == 'S');
+
+                    exemplarRequerido.emprestar();
+                    Emprestimo emprestimo = new Emprestimo(usuarioLogado, exemplarRequerido);
                     break;
 
                 // Dados do emprestimo.
@@ -348,9 +399,8 @@ public class App {
      * Método de validação de opções baseadas em List e ArrayLists genéricas.
      * Entra em loop enquanto a opção escolhida não estiver dentro da lista.
      *
-     * @param <T>          Curso, Exemplar e Usuário
-     * @param lista        Lista de opções disponíveis.
-     * @param mensagemErro Mensagem a ser exibida para opções inválidas.
+     * @param <T>   Curso, Exemplar e Usuário
+     * @param lista Lista de opções disponíveis.
      * @return T - item selecionado da lista.
      */
     public static <T> T validarOpcaoLista(List<T> lista) {
@@ -368,7 +418,7 @@ public class App {
 
     /**
      * Lê e valida uma resposta de sim ou não.
-     *  
+     * 
      * @return char - Respota final;
      */
     public static char lerRespostaSimNao(char opcao) {
@@ -380,5 +430,4 @@ public class App {
         } while (opcao != 'S' && opcao != 'n');
         return opcao;
     }
-
 }

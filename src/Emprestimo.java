@@ -7,10 +7,10 @@ public class Emprestimo {
     private LocalDate dataEmprestimo;
     private LocalDate dataDevolucao;
 
-    public Emprestimo(Usuario aluno, Exemplar exemplar, LocalDate dataEmprestimo) {
+    public Emprestimo(Usuario aluno, Exemplar exemplar) {
         this.aluno = aluno;
         this.exemplar = exemplar;
-        this.dataEmprestimo = dataEmprestimo;
+        this.dataEmprestimo = LocalDate.now();
         this.dataDevolucao = dataEmprestimo.plusDays(totalDiasEmprestimo);
     }
 
