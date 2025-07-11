@@ -14,7 +14,8 @@ public class Exemplar {
     }
 
     /**
-     * Função de atualização dos atributos no momento do emprestimo.
+     * Método de atualização dos atributos no momento do emprestimo.
+     * 
      * Retira um do estoque disponível do livro no sistema.
      * Atualiza o status do exemplar para indisponível.
      */

@@ -48,9 +48,11 @@ public class Curso {
     public String getCodigo() {
         return this.codigo;
     }
+
     public String getNome() {
         return this.nome;
     }
+    
     public String getModalidade() {
         return this.modalidade;
     }

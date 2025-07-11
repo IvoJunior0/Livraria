@@ -10,6 +10,10 @@ public class App {
     public static boolean logado = false;
 
     public static void main(String[] args) throws Exception {
+        /*
+         * Como não é possível cadastrar cursos, livros e exemplares no sistema,
+         * as listas de livros e exemplares cadastrados serão Lists, e não ArrayLists.
+         */
         List<Curso> cursos = Arrays.asList(
                 new Curso("Informática", "Técnico Integrado"),
                 new Curso("Meio Ambiente", "Técnico Integrado"),
@@ -30,6 +34,8 @@ public class App {
                                                                                                   // usuários serão
                                                                                                   // usados como
                                                                                                   // indexes.
+        // Referência ao objeto das credenciais que o usuário escolher na hora do login.
+        // A variável logado serve como um checkout rápido para saber se o ponteiro aponta para algum objeto.
         Usuario usuarioLogado = new Usuario();
 
         List<Livro> livros = Arrays.asList(
@@ -44,7 +50,9 @@ public class App {
 
         // HashMap da lista de emprestimos relacionados aos usuários.
         // Usado para verficações e coleta de dados rápidas (em O(1)).
-        Map<Usuario, Emprestimo> emprestimos = new HashMap<>();
+        // Key: código do usuário.
+        // Value: dados do empréstimo.
+        Map<Integer, Emprestimo> emprestimos = new HashMap<>();
 
         int opcaoMenu = 0;
 
@@ -79,10 +87,13 @@ public class App {
                 case 1:
                     // Variáveis usadas para passar como parametros no cadastro do usuário.
                     Usuario user = new Usuario();
+                    // Inputs do usuário.
                     String usuarioNome, usuarioSenha;
                     char confimarDados = ' ';
                     Curso cursoEscolhido;
 
+                    // Só sairá desse loop se os dados forem totalmente confirmados
+                    // ou se usuário não quiser cadastrar outros dados após cancelar o cadastro.
                     while (true) {
                         System.out.println("\nNome do usuário:");
                         usuarioNome = scanner.nextLine();
@@ -116,6 +127,7 @@ public class App {
                         }
                     }
 
+                    // Somente se os dados forem confirmados. Se não, ele só volta pro menu.
                     if (confimarDados == 'S') {                        
                         user.cadastrarUsuario(usuarioNome, cursoEscolhido, usuarioSenha);
     
@@ -128,17 +140,29 @@ public class App {
                 // Login
                 case 2:
                     if (logado) {
-                        System.out.println("Você já está logado. Deseja sair de sua conta? (S/n)");
+                        System.out.println("\nVocê já está logado. Deseja sair de sua conta? (S/n)");
                         char sairOpcao = ' ';
                         sairOpcao = lerRespostaSimNao(sairOpcao);
 
-                        // Até chegar ele terá digitado ou 'S' ou 'n', obrigatoriamente.
+                        // Se ele quiser continuar logado.
                         if (sairOpcao == 'n') {
                             break;
                         }
                         logado = false;
+
+                        System.out.println("\nLogout feito com sucesso!");
+                        System.out.println("Deseja fazer login em outra conta? (S/n)");
+                        sairOpcao = lerRespostaSimNao(sairOpcao);
+
+                        // Se quiser entrar em outra conta.
+                        if (sairOpcao == 'n') {
+                            break;
+                        }
+
+                        scanner.nextLine(); // Limpando buffer.
                     }
 
+                    
                     // Usuário continuará deslogado enquanto as credenciais estiverem erradas
                     while (!logado) {
                         String matriculaLogin, senhaLogin;
@@ -177,8 +201,11 @@ public class App {
                         System.out.println("\nVocê precisa estar logado para acessar essa funcionalidade.");
                         break;
                     }
-                    String novoNome = usuarioLogado.getNome(), novaSenha = "";
+                    String novoNome = usuarioLogado.getNome(), novaSenha = "", senhaConfirmacao = "";
                     Curso novoCurso = usuarioLogado.getCurso();
+                    boolean senhaValidada = false;
+                    char voltarMenu = ' ';
+                    int opcaoAlterar = 0;
 
                     // Dados passíveis de alterações diretamente pelo usuário.
                     // Matricula e código serão lidadas pelo sistema.
@@ -186,32 +213,66 @@ public class App {
                     System.out.println("1. Nome");
                     System.out.println("2. Senha");
                     System.out.println("3. Curso");
+                    System.out.println("4. Voltar ao menu");
                     System.out.println("Deseja alterar que dado do usuário?");
-                    // TODO: sistema de opção inválida.
-                    int opcaoAlterar = scanner.nextInt();
+                    opcaoAlterar = validarOpcao(4);
 
                     switch (opcaoAlterar) {
                         case 1: // Nome
                             System.out.println("\nEscolha um novo nome:");
                             novoNome = scanner.nextLine();
 
-                            usuarioLogado.cadastrarUsuario(novoNome, novoCurso);
+                            usuarioLogado.alterarDados(opcaoMenu, novoNome);
                             break;
                         case 2: // Senha
-                            System.out.println("\nNova senha:");
-                            novaSenha = validarSenha(8);
+                        while (!senhaValidada) {
+                                scanner.nextLine(); // Limpando buffer.
 
-                            usuarioLogado.cadastrarUsuario(novoNome, novoCurso, novaSenha);
+                                System.out.println("\nNova senha:");
+                                novaSenha = validarSenha(8);
+                                
+                                System.out.println("\nConfirmar senha:");
+                                senhaConfirmacao = validarSenha(8);
+                                
+                                if (novaSenha != senhaConfirmacao) {
+                                    System.out.println("\nSenha não foi confirmada. Houve erro de digitação.");
+                                    System.out.println("Deseja tentar novamente? (S/n)");
+
+                                    voltarMenu = lerRespostaSimNao(voltarMenu);
+                                }
+                                // TODO: tentar entender pq q quando eu digito que nn quero escrever outra senha ele abre os menus de reescrever a senha.
+                                // Se ele não quiser digitar outra senha.
+                                if (voltarMenu == 'n') {
+                                    break;
+                                }
+                                
+                                senhaValidada = true;
+                            }
+
+                            // Se ele não quiser digitar outra senha.
+                            if (voltarMenu == 'n') {
+                                break;
+                            }
+
+                            usuarioLogado.alterarDados(opcaoMenu, novaSenha);
                             break;
                         case 3: // Curso
                             imprimirListaCursos(cursos);
                             System.out.println("Selecione seu curso:");
                             novoCurso = validarOpcaoLista(cursos);
-
-                            usuarioLogado.cadastrarUsuario(novoNome, novoCurso);
+                            
+                            usuarioLogado.alterarDados(opcaoMenu, novoCurso);
+                            break;
+                        case 4: // Voltar ao menu.
                             break;
                         default:
+                            System.out.println("\nOpção inválida");
                             break;
+                    }
+
+                    // Evitar que ele imprima os dados.
+                    if (voltarMenu == 'n') {
+                        break;
                     }
 
                     System.out.println("\nDados atualizados:");
@@ -220,12 +281,11 @@ public class App {
 
                 // Fazer emprestimo.
                 case 4:
-                    // if (!logado) {
-                    // System.out.println("\nVocê precisa estar logado para acessar essa
-                    // funcionalidade.");
-                    // break;
-                    // }
-                    int opcaoLivro;
+                    if (!logado) {
+                        System.out.println("\nVocê precisa estar logado para acessar essa funcionalidade.");
+                        break;
+                    }
+
                     char escolherLivroOpcao = ' ';
 
                     // Tabela de livros cadastrados no sistema.
@@ -342,12 +402,18 @@ public class App {
 
                     exemplarRequerido.emprestar();
                     Emprestimo emprestimo = new Emprestimo(usuarioLogado, exemplarRequerido);
+                    emprestimos.put(usuarioLogado.getCodigo(), emprestimo);
                     break;
 
                 // Dados do emprestimo.
                 case 5:
                     if (!logado) {
                         System.out.println("\nVocê precisa estar logado para acessar essa funcionalidade.");
+                        break;
+                    }
+
+                    if (!usuarioLogado.fezEmprestimo(emprestimos)) {
+                        System.out.println("\nVocê não tem emprestimos cadastrados em seu nome.");
                         break;
                     }
                     break;
@@ -358,17 +424,22 @@ public class App {
                         System.out.println("\nVocê precisa estar logado para acessar essa funcionalidade.");
                         break;
                     }
+
+                    if (!usuarioLogado.fezEmprestimo(emprestimos)) {
+                        System.out.println("\nVocê não tem emprestimos cadastrados em seu nome.");
+                        break;
+                    }
                     break;
+                
+                // Sair do sistema.
                 case 7:
+                    System.out.println("Obrigado e volte sempre!");
                     break;
                 default:
-                    System.out.println("Opção inválida");
+                    System.out.println("\nOpção inválida");
                     break;
             }
         }
-
-        // Ao sair do projeto.
-        System.out.println("Obrigado e volte sempre!");
     }
 
     /**
@@ -439,7 +510,26 @@ public class App {
     }
 
     /**
-     * Função de validação de senhas.
+     * Método de validação de opção.
+     * Entra em loop enquanto a opção escolhida for negativa ou maior que o número de opções.
+     * 
+     * @param numeroOpcoes Número de opções disponíveis.
+     * @return int - Opção válida.
+     */
+    public static int validarOpcao(int numeroOpcoes) {
+        int opcao;
+        do {
+            opcao = scanner.nextInt();
+            if (opcao < 1 || opcao > numeroOpcoes) {
+                System.out.println("\nOpção inválida!");
+                System.out.println("Por favor, digite escolha outra:");
+            }
+        } while (opcao < 1 || opcao > numeroOpcoes);
+        return opcao;
+    }
+
+    /**
+     * Método de validação de senhas.
      * Entra em loop enquanto a senha não tiver um tamanho mínimo aceito.
      * 
      * @param tamanhoMinimoSenha Numero minimo de caracteres que a senha deve ter.
@@ -480,6 +570,7 @@ public class App {
     /**
      * Lê e valida uma resposta de sim ou não.
      * 
+     * @param opcao Opção digitada pelo usuário.
      * @return char - Respota final;
      */
     public static char lerRespostaSimNao(char opcao) {
