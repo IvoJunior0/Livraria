@@ -201,10 +201,9 @@ public class App {
                         System.out.println("\nVocê precisa estar logado para acessar essa funcionalidade.");
                         break;
                     }
-                    String novoNome = usuarioLogado.getNome(), novaSenha = "", senhaConfirmacao = "";
+
                     Curso novoCurso = usuarioLogado.getCurso();
-                    boolean senhaValidada = false;
-                    char voltarMenu = ' ';
+                    boolean dadosConfirmados = false;
                     int opcaoAlterar = 0;
 
                     // Dados passíveis de alterações diretamente pelo usuário.
@@ -219,49 +218,14 @@ public class App {
 
                     switch (opcaoAlterar) {
                         case 1: // Nome
-                            System.out.println("\nEscolha um novo nome:");
-                            novoNome = scanner.nextLine();
-
-                            usuarioLogado.alterarDados(opcaoMenu, novoNome);
+                            dadosConfirmados = usuarioLogado.alterarNome();
                             break;
                         case 2: // Senha
-                        while (!senhaValidada) {
-                                scanner.nextLine(); // Limpando buffer.
-
-                                System.out.println("\nNova senha:");
-                                novaSenha = validarSenha(8);
-                                
-                                System.out.println("\nConfirmar senha:");
-                                senhaConfirmacao = validarSenha(8);
-                                
-                                if (novaSenha != senhaConfirmacao) {
-                                    System.out.println("\nSenha não foi confirmada. Houve erro de digitação.");
-                                    System.out.println("Deseja tentar novamente? (S/n)");
-
-                                    voltarMenu = lerRespostaSimNao(voltarMenu);
-                                }
-                                // TODO: tentar entender pq q quando eu digito que nn quero escrever outra senha ele abre os menus de reescrever a senha.
-                                // Se ele não quiser digitar outra senha.
-                                if (voltarMenu == 'n') {
-                                    break;
-                                }
-                                
-                                senhaValidada = true;
-                            }
-
-                            // Se ele não quiser digitar outra senha.
-                            if (voltarMenu == 'n') {
-                                break;
-                            }
-
-                            usuarioLogado.alterarDados(opcaoMenu, novaSenha);
+                            dadosConfirmados = usuarioLogado.alternarSenha();
                             break;
                         case 3: // Curso
                             imprimirListaCursos(cursos);
-                            System.out.println("Selecione seu curso:");
-                            novoCurso = validarOpcaoLista(cursos);
-                            
-                            usuarioLogado.alterarDados(opcaoMenu, novoCurso);
+                            dadosConfirmados = usuarioLogado.alterarCurso(cursos);
                             break;
                         case 4: // Voltar ao menu.
                             break;
@@ -271,7 +235,7 @@ public class App {
                     }
 
                     // Evitar que ele imprima os dados.
-                    if (voltarMenu == 'n') {
+                    if (!dadosConfirmados) {
                         break;
                     }
 
@@ -433,7 +397,7 @@ public class App {
                 
                 // Sair do sistema.
                 case 7:
-                    System.out.println("Obrigado e volte sempre!");
+                    System.out.println("\nObrigado e volte sempre!");
                     break;
                 default:
                     System.out.println("\nOpção inválida");

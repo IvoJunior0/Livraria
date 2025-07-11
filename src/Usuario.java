@@ -1,5 +1,7 @@
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 public class Usuario {
     private static int quantidadeUsuarios;
@@ -91,31 +93,182 @@ public class Usuario {
     }
 
     /**
-     * Método de alteração de dados do usuário baseado na escolha em menus.
+     * Método de alteração do nome do usuário.
      * 
-     * @param dadoEscolhido Código da opção do dado escolhido.
-     * @param novoDado Novo valor a ser alterado.
+     * @return boolean - Se o novo nome foi ou não cadastrado.
      */
-    public void alterarDados(int dadoEscolhido, Object novoDado) {
-        switch (dadoEscolhido) {
-            // Nome
-            case 1:
-                this.nome = novoDado.toString();
-                break;
-            // Senha
-            case 2:
-                this.senha = novoDado.toString();
-                break;
-            // Curso
-            case 3:
-                this.curso = (Curso) novoDado;
-                break;
-            
-            default:
-                break;
-        }
+    public boolean alterarNome() {
+        Scanner scanner = new Scanner(System.in);
+        String novoNome;
+
+        System.out.println("\nNome do usuário:");
+        novoNome = scanner.nextLine();
+        novoNome = capitalizarTexto(novoNome);
+        // TODO: se o novo curso escolhido for igual ao já cadastrado, pedir para o usuário escolher outro curso.
+
+        this.nome = novoNome;
+        return true;
     }
 
+    /**
+     * Método de alteração de senha.
+     * 
+     * Lê a nova senha a confimação dela.
+     * Entra em loop até a nova senha e a senha de confirmação forem iguais.
+     * Dá a opção de voltar ao menu se o usuário não quiser mais trocar a senha.
+     * 
+     * @return boolean - Se a senha for alteradaou não.
+     */
+    public boolean alternarSenha() {
+        Scanner scanner = new Scanner(System.in);
+        String novaSenha = "", senhaConfirmacao;
+        boolean senhaValidada = false;
+        char tentarNovamente = ' ';
+        
+        while (!senhaValidada || tentarNovamente == 'S') {
+            
+            System.out.println("\nNova senha:");
+            novaSenha = validarSenha(8);
+            System.out.println(novaSenha);
+            
+            System.out.println("\nConfirmar senha:");
+            senhaConfirmacao = validarSenha(8);
+            System.out.println(senhaConfirmacao);
+            
+            if (!novaSenha.equals(senhaConfirmacao)) {
+                senhaValidada = false;
+
+                System.out.println("\nSenha não foi confirmada. Houve erro de digitação.");
+                System.out.println("Deseja tentar novamente? (S/n)");
+                
+                tentarNovamente = lerRespostaSimNao(tentarNovamente);
+            } else {
+                tentarNovamente = 'n';
+                senhaValidada = true;
+                break;
+            }
+
+            // scanner.nextLine(); // Limpando buffer.
+            
+            // Se ele não quiser digitar outra senha.
+            if (tentarNovamente == 'n') {
+                return false;
+            }
+        }
+
+        this.senha = novaSenha;
+        return true;
+    }
+
+    /**
+     * Método de alteração do curso do usuário.
+     * Seleção de novo cursos baseados na lista de cursos disponíveis.
+     * 
+     * @param listaCursos Lista de cursos disponíveis.
+     * @return boolean - Se o curso foi alterado ou não.
+     */
+    public boolean alterarCurso(List<Curso> listaCursos) {
+        Scanner scanner = new Scanner(System.in);
+        Curso novoCurso;
+        
+        System.out.println("Selecione seu curso:");
+        novoCurso = validarOpcaoLista(listaCursos);
+        // TODO: se o novo curso escolhido for igual ao já cadastrado, pedir para o usuário escolher outro curso.
+
+        this.curso = novoCurso;
+        return true;
+    }
+
+    /**
+     * Método de capitalização de textos.
+     * 
+     * O texto é dividido em palavras com base em espaços usando regex.
+     * Em seguida, cada palavra tem seu primeiro caractere convertido para maiúsculo e é
+     * concatenada ao resultado final.
+     * 
+     * Exemplo: "joão gabriel" torna-se "João Gabriel".
+     * 
+     * @param texto Texto a ser capitalizado.
+     * @return String - Texto capitalizado.
+     */
+    public static String capitalizarTexto(String texto) {
+        StringBuilder novoTexto = new StringBuilder(); // Evitar concatenação.
+        String[] palavras = texto.trim().split("\\s+");
+
+        for (int i = 0; i < palavras.length; i++) {
+            String palavra = palavras[i];
+            if (!palavra.isEmpty()) {
+                novoTexto.append( palavra.substring(0, 1).toUpperCase() + palavra.substring(1)
+                );
+                if (i < palavras.length - 1) {
+                    // Evitar que adicione espaço na última palavra
+                    // para que não fique "João Gabriel "
+                    novoTexto.append(" "); 
+                }
+            }
+        }
+
+        return novoTexto.toString();
+    }
+
+    /**
+     * Método de validação de opções baseadas em List e ArrayLists genéricas.
+     * Entra em loop enquanto a opção escolhida não estiver dentro da lista.
+     *
+     * @param <T>   Curso, Exemplar e Usuário
+     * @param lista Lista de opções disponíveis.
+     * @return T - item selecionado da lista.
+     */
+    public static <T> T validarOpcaoLista(List<T> lista) {
+        Scanner scanner = new Scanner(System.in);
+        int opcao;
+        do {
+            opcao = scanner.nextInt();
+            if (opcao < 1 || opcao > lista.size()) {
+                System.out.println("\nOpção inválida!");
+                System.out.println("Por favor, escolha uma que esteja dentro da lista:");
+            }
+        } while (opcao < 1 || opcao > lista.size());
+
+        return lista.get(opcao - 1);
+    }
+    
+    /**
+     * Método de validação de senhas.
+     * Entra em loop enquanto a senha não tiver um tamanho mínimo aceito.
+     * 
+     * @param tamanhoMinimoSenha Numero minimo de caracteres que a senha deve ter.
+     * @return String - Senha do usuário.
+     */
+    public static String validarSenha(int tamanhoMinimoSenha) {
+        Scanner scanner = new Scanner(System.in);
+        String senha;
+        do {
+            senha = scanner.nextLine();
+            if (senha.length() < tamanhoMinimoSenha) {
+                System.out.printf("Por favor, insira uma senha com %d digitos ou mais:\n", tamanhoMinimoSenha);
+            }
+        } while (senha.length() < tamanhoMinimoSenha);
+        return senha;
+    }
+
+    /**
+     * Lê e valida uma resposta de sim ou não.
+     * 
+     * @param opcao Opção digitada pelo usuário.
+     * @return char - Respota final;
+     */
+    public static char lerRespostaSimNao(char opcao) {
+        Scanner scanner = new Scanner(System.in);
+        do {
+            opcao = scanner.next().charAt(0);
+            if (opcao != 'S' && opcao != 'n') {
+                System.out.println("Opção inválida. Digita novamente.");
+            }
+        } while (opcao != 'S' && opcao != 'n');
+        return opcao;
+    }
+    
     public int getCodigo() {
         return this.codigo;
     }
