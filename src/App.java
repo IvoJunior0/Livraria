@@ -202,7 +202,6 @@ public class App {
                         break;
                     }
 
-                    Curso novoCurso = usuarioLogado.getCurso();
                     boolean dadosConfirmados = false;
                     int opcaoAlterar = 0;
 
@@ -252,104 +251,40 @@ public class App {
 
                     char escolherLivroOpcao = ' ';
 
-                    // Tabela de livros cadastrados no sistema.
-                    // Código - Tìtulo (Autor) - Edição - Número de páginas - Estoque
-                    // Calculo do tamanho mínimo de cada coluna da tabela.
-                    int codColunaTamanho = "Código".length();
-                    int tituloAutorColunaTamanho = "Título (Autor)".length();
-                    int edicaoAnoColunaTamanho = "Edição (Ano)".length();
-                    int paginasColunaTamanho = "Nº de Páginas".length();
-                    int estoqueColunaTamanho = "Estoque".length();
+                    List<String[]> tabelaLivros = new ArrayList<>();
+                    tabelaLivros.add(new String[]{"Código", "Título (Autor)", "Edição (Ano)", "Nº de Páginas", "Estoque"});
 
-                    /*
-                     * Checando se o tamanho do valor dos atributos são maiores que o tamanho mínimo de cada coluna.
-                     * Se for, o novo valores é atribuido ao tamanho da coluna.
-                     * O método max é usada para saber qual valor é maior dentre o tamanho mínimo e o valor do atributo.
-                     */
+                    // Iteração para armazenar o valor da coluna de cada item da lista livros.
                     for (Livro livro : livros) {
-                        codColunaTamanho = Math.max(codColunaTamanho, String.valueOf(livro.getCodigo()).length());
-                        tituloAutorColunaTamanho = Math.max(tituloAutorColunaTamanho,
-                                (livro.getTitulo() + " (" + livro.getAutor() + ")").length());
-                        edicaoAnoColunaTamanho = Math.max(edicaoAnoColunaTamanho,
-                                (livro.getEdicao() + " (" + livro.getAno() + ")").length());
-                        paginasColunaTamanho = Math.max(paginasColunaTamanho,
-                                (livro.getNumeroPaginas() + " Páginas").length());
-                        estoqueColunaTamanho = Math.max(estoqueColunaTamanho,
-                                ("Disponíveis: " + livro.getEstoque()).length());
+                        tabelaLivros.add(new String[]{
+                            String.valueOf(livro.getCodigo()),
+                            livro.getTitulo() + " (" + livro.getAutor() + ")",
+                            livro.getEdicao() + " (" + livro.getAno() + ")",
+                            livro.getNumeroPaginas() + " Páginas",
+                            "Disponíveis: " + livro.getEstoque()
+                        });
                     }
 
-                    // A linha horizontal é algo semelhante a isso:
-                    // +----+-----+------+------+
-                    String linhaHorizontal = "+" +
-                            "-".repeat(codColunaTamanho + 2) + "+" +
-                            "-".repeat(tituloAutorColunaTamanho + 2) + "+" +
-                            "-".repeat(edicaoAnoColunaTamanho + 2) + "+" +
-                            "-".repeat(paginasColunaTamanho + 2) + "+" +
-                            "-".repeat(estoqueColunaTamanho + 2) + "+"; // + 2 são as margens horizontais das colunas.
-
-                    // Imprimir o cabeçalho da tabela de livros.
-                    System.out.println("\nLivros disponíveis:");
-                    System.out.println('\n' + linhaHorizontal); // +----+-----+------+------+
-                    System.out.printf(
-                            "| %-" + codColunaTamanho + "s | %-" + tituloAutorColunaTamanho + "s | %-"
-                                    + edicaoAnoColunaTamanho + "s | %-" + paginasColunaTamanho + "s | %-"
-                                    + estoqueColunaTamanho + "s |\n",
-                            "Código", "Título (Autor)", "Edição (Ano)", "Nº de Páginas", "Estoque");
-                    System.out.println(linhaHorizontal); // +----+-----+------+------+
-
-                    // Imprimir as linhas dos livros.
-                    for (Livro livro : livros) {
-                        System.out.printf(
-                                "| %-" + codColunaTamanho + "s | %-" + tituloAutorColunaTamanho + "s | %-"
-                                        + edicaoAnoColunaTamanho + "s | %-" + paginasColunaTamanho + "s | %-"
-                                        + estoqueColunaTamanho + "s |\n",
-                                livro.getCodigo(),
-                                livro.getTitulo() + " (" + livro.getAutor() + ")",
-                                livro.getEdicao() + " (" + livro.getAno() + ")",
-                                livro.getNumeroPaginas() + " Páginas",
-                                "Disponíveis: " + livro.getEstoque());
-                    }
-                    System.out.println(linhaHorizontal); // Linha final. +----+-----+------+------+
-
-                    // Lista de exemplares.
-                    // Código - Tìtulo do exemplar - Status
-                    int colunaTituloTamanho = "Título".length();
-                    int colunaStatusTamanho = "Status".length();
-
-                    for (Exemplar exemplar : exemplares) {
-                        colunaTituloTamanho = Math.max(colunaTituloTamanho, String.valueOf(exemplar.getLivro().getTitulo()).length());
-                        colunaStatusTamanho = Math.max(colunaStatusTamanho, exemplar.getStatus().length());
-                    }
-
-                    // Atualizando o layout da linha horizontal para lista de exemplares.
-                    linhaHorizontal = "+" + 
-                                "-".repeat(codColunaTamanho + 2) + "+" +
-                                "-".repeat(colunaTituloTamanho + 2) + "+" +
-                                "-".repeat(colunaStatusTamanho + 2) + "+";
+                    imprimirTabela(tabelaLivros);
                     
-                    // Imprimir cabeçalho da lista de exemplares.
-                    System.out.println("\nExemplares:");
-                    System.out.println('\n' + linhaHorizontal); // +----+-----+------+------+
-                    System.out.printf(
-                            "| %-" + codColunaTamanho + "s | %-" + colunaTituloTamanho + "s | %-"
-                                    + colunaStatusTamanho + "s |\n",
-                            "Código", "Título", "Status");
-                    System.out.println(linhaHorizontal); // +----+-----+------+------+
+                    List<String[]> tabelaExemplares = new ArrayList<>();
+                    tabelaExemplares.add(new String[]{"Código", "Título", "Status"});
 
-                    // Imprimir as linhas dos exemplares.
                     for (Exemplar exemplar : exemplares) {
-                        System.out.printf(
-                                "| %-" + codColunaTamanho + "s | %-" + colunaTituloTamanho + "s | %-"
-                                        + colunaStatusTamanho + "s |\n",
-                                exemplar.getCodigo(),
-                                exemplar.getLivro().getTitulo(),
-                                exemplar.getStatus());
+                        tabelaExemplares.add(new String[]{
+                            String.valueOf(exemplar.getCodigo()),
+                            exemplar.getLivro().getTitulo(),
+                            exemplar.getStatus()
+                        });
                     }
-                    System.out.println(linhaHorizontal); // Linha final. +----+-----+------+------+
-                    Exemplar exemplarRequerido = null; // Referência ao exemplar escolhido, não uma cópia dele.
 
+                    imprimirTabela(tabelaExemplares);
+
+                    Exemplar exemplarRequerido = null; // Referência ao exemplar escolhido, não uma cópia dele.
                     // Repetir até a pessoa escolher um livro disponível.
                     do {
+                        escolherLivroOpcao = 'n'; // Por padrão a respota vai ser não para escolher outro livro em todo novo loop.
+
                         System.out.println("Qual exemplar você deseja? (Digite o código)");
                         exemplarRequerido = validarOpcaoLista(exemplares);
                         
@@ -380,6 +315,18 @@ public class App {
                         System.out.println("\nVocê não tem emprestimos cadastrados em seu nome.");
                         break;
                     }
+
+                    // TODO: fzr imprimir os dados do emprestimo.
+                    Emprestimo emprestimoUsuario = emprestimos.get(usuarioLogado.getCodigo());
+                    List<String[]> tabelaEmprestimo = new ArrayList<>();
+                    tabelaEmprestimo.add(new String[]{"Aluno", "Exemplar", "Data do empréstimo", "Data de devolução"});
+                    tabelaEmprestimo.add(new String[]{
+                        emprestimoUsuario.getAluno().getNome(),
+                        emprestimoUsuario.getExemplar().getLivro().getTitulo()
+                    });
+
+                    // Imprimindo tabela de dados do emprestimo.
+                    System.out.printf("\nTítulo do exemplar: %s\n", emprestimoUsuario.getExemplar().getLivro().getTitulo());
                     break;
 
                 // Fazer devolução.
@@ -403,6 +350,40 @@ public class App {
                     System.out.println("\nOpção inválida");
                     break;
             }
+        }
+    }
+
+    public static void imprimirTabela(List<String[]> colunas) {
+        if (colunas.isEmpty()) return;
+        
+        int quantidadeColunas = colunas.get(0).length; // o index 0 é referente ao valor tamanho mínimo das colunas.
+        int[] tamanhoColunas = new int[quantidadeColunas]; // Armazena o tamanho a ser impresso de cada coluna.
+        
+        // Calcular o tamanho máximo por coluna.
+        for (String[] coluna : colunas) {
+            for (int i = 0; i < quantidadeColunas; i++) {
+                tamanhoColunas[i] = Math.max(tamanhoColunas[i], coluna[i].length());
+            }
+        }
+        
+        // Imprimir linha horizontal.
+        StringBuilder horizontal = new StringBuilder("+");
+        for (int tamanho : tamanhoColunas) horizontal.append("-".repeat(tamanho + 2)).append("+");
+        String linhaHorizontal = horizontal.toString();
+        
+        // Linha cabeçalho
+        System.out.println();
+        System.out.println(linhaHorizontal);
+
+        // Imprimir cada linha.
+        for (int r = 0; r < colunas.size(); r++) {
+            String[] linha = colunas.get(r);
+            System.out.print("|");
+            for (int i = 0; i < quantidadeColunas; i++) {
+                System.out.printf(" %-"+tamanhoColunas[i]+"s |", linha[i]);
+            }
+            System.out.println();
+            System.out.println(linhaHorizontal);
         }
     }
 

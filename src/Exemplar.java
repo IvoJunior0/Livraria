@@ -1,7 +1,7 @@
 public class Exemplar {
     private static int quantidadeTotalExemplares = 0;
     private int codigo;
-    public String status;
+    private String status;
     private Livro livro;
 
     public Exemplar(Livro livro) {
@@ -21,7 +21,7 @@ public class Exemplar {
      */
     public void emprestar() {
         this.getLivro().atualizarEstoque(-1);
-        this.status = "Indisponível";
+        this.status = "Emprestado";
     }
 
     public Livro getLivro() {

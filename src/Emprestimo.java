@@ -27,4 +27,24 @@ public class Emprestimo {
     public void devolverExemplar() {
 
     }
+
+    public static int getTotalDiasEmprestimo() {
+        return Emprestimo.totalDiasEmprestimo;
+    }
+
+    public Usuario getAluno() {
+        return this.aluno;
+    }
+
+    public Exemplar getExemplar() {
+        return this.exemplar;
+    }
+
+    public LocalDate getDataEmprestimo() {
+        return this.dataEmprestimo;
+    }
+
+    public LocalDate getDataDevolucao() {
+        return this.dataDevolucao;
+    }
 }
