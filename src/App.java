@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
 
 public class App {
     public static Scanner scanner = new Scanner(System.in);
@@ -13,6 +14,9 @@ public class App {
         /*
          * Como não é possível cadastrar cursos, livros e exemplares no sistema,
          * as listas de livros e exemplares cadastrados serão Lists, e não ArrayLists.
+         * 
+         * Como é possível cadastrar vários usuários, a lista de usuários cadastrados
+         * é um ArrayList.
          */
         List<Curso> cursos = Arrays.asList(
                 new Curso("Informática", "Técnico Integrado"),
@@ -35,7 +39,7 @@ public class App {
                                                                                                   // usados como
                                                                                                   // indexes.
         // Referência ao objeto das credenciais que o usuário escolher na hora do login.
-        // A variável logado serve como um checkout rápido para saber se o ponteiro aponta para algum objeto.
+        // A variável logado serve como um checkout rápido para saber se o ponteiro aponta para algum objeto Usuário.
         Usuario usuarioLogado = new Usuario();
 
         List<Livro> livros = Arrays.asList(
@@ -49,9 +53,9 @@ public class App {
         );
 
         // HashMap da lista de emprestimos relacionados aos usuários.
-        // Usado para verficações e coleta de dados rápidas (em O(1)).
+        // Usado para verficações e coleta de dados rápidas em O(1).
         // Key: código do usuário.
-        // Value: dados do empréstimo.
+        // Value: objeto do empréstimo.
         Map<Integer, Emprestimo> emprestimos = new HashMap<>();
 
         int opcaoMenu = 0;
@@ -70,15 +74,19 @@ public class App {
         System.out.println("Por Ivo Jr.");
 
         // Programa principal.
-        while (opcaoMenu != 7) {
+        while (opcaoMenu != 10) {
             System.out.println("\n1. Fazer cadastro");
             System.out.println("2. Login");
             System.out.println("3. Alterar dados do usuário");
             System.out.println("4. Fazer emprestimo");
-            System.out.println("5. Dados do emprestimo");
+            System.out.println("5. Dados detalhados do emprestimo");
             System.out.println("6. Fazer devolução");
-            System.out.println("7. Sair do sistema");
+            System.out.println("7. Logout");
+            System.out.println("8. Perfil do usuário");
+            System.out.println("9. Mostrar emprestimos ativos");
+            System.out.println("10. Sair do sistema");
 
+            System.out.println("Qual operação você deseja fazer?");
             opcaoMenu = scanner.nextInt();
             scanner.nextLine(); // Limpar buffer.
 
@@ -179,10 +187,7 @@ public class App {
                                 logado = true;
 
                                 System.out.println("\nLogin feito com sucesso!");
-                                // Sepração em array do nome usando espaços como parâmetros.
-                                // [0] se refere ao primeiro nome do usuário.
-                                String primeiroNome = usuarioLogado.getNome().split("[\\s]")[0];
-                                System.out.printf("Bem-vindo, %s.\n", primeiroNome);
+                                System.out.printf("Bem-vindo, %s.\n", usuarioLogado.getPrimeiroNome());
                                 break;
                             }
                         }
@@ -249,14 +254,21 @@ public class App {
                         break;
                     }
 
+                    // Só é permitido um emprestimo por usuário.
+                    if (usuarioLogado.fezEmprestimo(emprestimos)) {
+                        System.out.println("\nEncontramos um emprestimo em seu nome.");
+                        System.out.println("Só é permitido um emprestimo de exemplar por usuário.");
+                        System.out.println("Por favor, espere o prazo acabar ou faça a devolução do exemplar.\n");
+                    }
+
                     char escolherLivroOpcao = ' ';
 
-                    List<String[]> tabelaLivros = new ArrayList<>();
-                    tabelaLivros.add(new String[]{"Código", "Título (Autor)", "Edição (Ano)", "Nº de Páginas", "Estoque"});
+                    List<String[]> linhasTabelaLivros = new ArrayList<>();
+                    linhasTabelaLivros.add(new String[]{"Código", "Título (Autor)", "Edição (Ano)", "Nº de Páginas", "Estoque"}); // Primeira linha da tabela.
 
-                    // Iteração para armazenar o valor da coluna de cada item da lista livros.
-                    for (Livro livro : livros) {
-                        tabelaLivros.add(new String[]{
+                    // Iteração para armazenar o valor da linha de cada item da lista livros.
+                    for (Livro livro : livros) { // As outras linhas da tabela.
+                        linhasTabelaLivros.add(new String[]{
                             String.valueOf(livro.getCodigo()),
                             livro.getTitulo() + " (" + livro.getAutor() + ")",
                             livro.getEdicao() + " (" + livro.getAno() + ")",
@@ -265,22 +277,22 @@ public class App {
                         });
                     }
 
-                    imprimirTabela(tabelaLivros);
+                    imprimirTabela(linhasTabelaLivros);
                     
-                    List<String[]> tabelaExemplares = new ArrayList<>();
-                    tabelaExemplares.add(new String[]{"Código", "Título", "Status"});
+                    List<String[]> linhasTabelaExemplares = new ArrayList<>();
+                    linhasTabelaExemplares.add(new String[]{"Código", "Título", "Status"});
 
                     for (Exemplar exemplar : exemplares) {
-                        tabelaExemplares.add(new String[]{
+                        linhasTabelaExemplares.add(new String[]{
                             String.valueOf(exemplar.getCodigo()),
                             exemplar.getLivro().getTitulo(),
                             exemplar.getStatus()
                         });
                     }
 
-                    imprimirTabela(tabelaExemplares);
+                    imprimirTabela(linhasTabelaExemplares);
 
-                    Exemplar exemplarRequerido = null; // Referência ao exemplar escolhido, não uma cópia dele.
+                    Exemplar exemplarRequerido; // Referência ao exemplar escolhido, não uma cópia dele.
                     // Repetir até a pessoa escolher um livro disponível.
                     do {
                         escolherLivroOpcao = 'n'; // Por padrão a respota vai ser não para escolher outro livro em todo novo loop.
@@ -316,17 +328,24 @@ public class App {
                         break;
                     }
 
-                    // TODO: fzr imprimir os dados do emprestimo.
                     Emprestimo emprestimoUsuario = emprestimos.get(usuarioLogado.getCodigo());
+
+                    // Formatando as datas do emprestimo para o formato brasileiro: dia, mês e ano.
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/uuuu");
+                    String dataEmprestimo = emprestimoUsuario.getDataEmprestimo().format(formatter);
+                    String dataDevolucao = emprestimoUsuario.getDataDevolucao().format(formatter);
+
                     List<String[]> tabelaEmprestimo = new ArrayList<>();
                     tabelaEmprestimo.add(new String[]{"Aluno", "Exemplar", "Data do empréstimo", "Data de devolução"});
                     tabelaEmprestimo.add(new String[]{
                         emprestimoUsuario.getAluno().getNome(),
-                        emprestimoUsuario.getExemplar().getLivro().getTitulo()
+                        emprestimoUsuario.getExemplar().getLivro().getTitulo(),
+                        dataEmprestimo,
+                        dataDevolucao
                     });
 
-                    // Imprimindo tabela de dados do emprestimo.
-                    System.out.printf("\nTítulo do exemplar: %s\n", emprestimoUsuario.getExemplar().getLivro().getTitulo());
+                    System.out.println("\nDados do emprestimo:");
+                    imprimirTabela(tabelaEmprestimo);
                     break;
 
                 // Fazer devolução.
@@ -342,10 +361,53 @@ public class App {
                     }
                     break;
                 
-                // Sair do sistema.
+                // Logout
                 case 7:
+                    if (!logado) {
+                        System.out.println("\nVocê precisa estar logado para acessar essa funcionalidade.");
+                        break;
+                    }
+                    char opcaoLogout = ' ';
+
+                    System.out.printf("\nVocê tem certeza que deseja sair de sua conta, %s? (S/n)\n", usuarioLogado.getPrimeiroNome());
+                    opcaoLogout = lerRespostaSimNao(opcaoLogout);
+
+                    if (opcaoLogout == 'S') {
+                        System.out.println("\n-> Logout feito com sucesso!");
+                        usuarioLogado = null;
+                        logado = false;
+                    }
+
+                    break;
+                
+                // Perfil do usuário
+                case 8:
+                    if (!logado) {
+                        System.out.println("\nVocê precisa estar logado para acessar essa funcionalidade.");
+                        break;
+                    }
+
+                    System.out.printf("\n=== PERFIL DE %s ===\n", usuarioLogado.getPrimeiroNome().toUpperCase());
+                    System.out.printf("-> Nome completo: %s\n", usuarioLogado.getNome());
+                    System.out.printf("-> Matricula: %s\n", usuarioLogado.getMatricula());
+                    System.out.printf("-> Curso: %s (%s)\n", usuarioLogado.getCurso().getNome(), usuarioLogado.getCurso().getModalidade());
+
+                    if (usuarioLogado.fezEmprestimo(emprestimos)) {
+                        Livro livroEmprestimo = emprestimos.get(usuarioLogado.getCodigo()).getExemplar().getLivro();
+
+                        System.out.printf("-> Exemplar emprestado: %s (Código: %d)\n", livroEmprestimo.getTitulo(), livroEmprestimo.getCodigo());
+                    }
+                    break;
+                
+                // Mostrar emprestimos ativos
+                case 9:
+                    break;
+                
+                // Sair do sistema.
+                case 10:
                     System.out.println("\nObrigado e volte sempre!");
                     break;
+                
                 default:
                     System.out.println("\nOpção inválida");
                     break;
@@ -383,7 +445,7 @@ public class App {
                 System.out.printf(" %-"+tamanhoColunas[i]+"s |", linha[i]);
             }
             System.out.println();
-            System.out.println(linhaHorizontal);
+            System.out.println(linhaHorizontal); // Linha que fica entre as linhas.
         }
     }
 

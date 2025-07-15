@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
@@ -86,7 +85,7 @@ public class Usuario {
      * @return boolean - Se tem ou não tem emprestimo cadastrado.
      */
     public boolean fezEmprestimo(Map<Integer, Emprestimo> emprestimosLista) {
-        if (emprestimosLista.get(this.getCodigo()) == null) {
+        if (emprestimosLista.get(this.codigo) == null) {
             return false;
         }
         return true;
@@ -275,6 +274,18 @@ public class Usuario {
 
     public String getNome() {
         return this.nome;
+    }
+
+    /**
+     * Getter do primeiro nome do usuário.
+     * 
+     * Sepração em array do nome completo com regex sendo espaços os parâmetros.
+     * [0] se refere ao primeiro nome do usuário.
+     * 
+     * @return String - Primeiro nome do usuário.
+     */
+    public String getPrimeiroNome() {
+        return this.nome.split("[\\s]")[0];
     }
 
     public String getMatricula() {
