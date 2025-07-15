@@ -129,7 +129,7 @@ public class App {
                             break;
                         }
 
-                        System.out.println("Deseja cadastrar outros dados? (S/n)");
+                        System.out.println("\nDeseja cadastrar outros dados? (S/n)");
                         confimarDados = lerRespostaSimNao(confimarDados);
 
                         // Se não quiser cadastrar outros dados.
@@ -142,7 +142,7 @@ public class App {
                     if (confimarDados == 'S') {
                         user.cadastrarUsuario(usuarioNome, cursoEscolhido, usuarioSenha);
 
-                        System.out.printf("Usuário %s cadastrado com sucesso!\n", user.getNome());
+                        System.out.printf("\nUsuário %s cadastrado com sucesso!", user.getNome());
                         imprimirDadosUsuario(user);
                         usuariosCadastrados.add(user);
                     }
@@ -205,7 +205,7 @@ public class App {
                 // Alterar dados do usuário.
                 case 3:
                     if (!logado) {
-                        System.out.println("\nVocê precisa estar logado para acessar essa funcionalidade.");
+                        System.out.println("\n-> Você precisa estar logado para acessar essa funcionalidade.");
                         break;
                     }
 
