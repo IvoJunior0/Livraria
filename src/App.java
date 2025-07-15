@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.Period;
 
 public class App {
     public static Scanner scanner = new Scanner(System.in);
@@ -77,6 +78,7 @@ public class App {
 
         // Programa principal.
         while (opcaoMenu != 10) {
+            System.out.printf("\nUsuário: %s", logado ? usuarioLogado.getPrimeiroNome() : "Offline");
             System.out.println("\n1. Fazer cadastro");
             System.out.println("2. Login");
             System.out.println("3. Alterar dados do usuário");
@@ -136,6 +138,8 @@ public class App {
                         if (confimarDados == 'n') {
                             break;
                         }
+
+                        scanner.nextLine(); // Limpar buffer.
                     }
 
                     // Somente se os dados forem confirmados. Se não, ele só volta pro menu.
@@ -176,6 +180,7 @@ public class App {
                     // Usuário continuará deslogado enquanto as credenciais estiverem erradas
                     while (!logado) {
                         String matriculaLogin, senhaLogin;
+                        char continuarLogin = 'S';
 
                         System.out.println("\nMatricula:");
                         matriculaLogin = scanner.nextLine();
@@ -198,6 +203,12 @@ public class App {
                         if (!logado) {
                             System.out.println("\nUsuário não encontrado:");
                             System.out.println("Senha ou matriculas incorretas.");
+                            System.out.println("Deseja continuar? (S/n)"); // Impedir softlock.
+                            continuarLogin = lerRespostaSimNao(continuarLogin);
+
+                            if (continuarLogin == 'n') {
+                                break;
+                            }
                         }
                     }
                     break;
@@ -210,6 +221,7 @@ public class App {
                     }
 
                     boolean dadosConfirmados = false;
+                    char alterarCurso = 'S';
                     int opcaoAlterar = 0;
 
                     // Dados passíveis de alterações diretamente pelo usuário.
@@ -230,8 +242,15 @@ public class App {
                             dadosConfirmados = usuarioLogado.alternarSenha();
                             break;
                         case 3: // Curso
-                            imprimirListaCursos(cursos);
-                            dadosConfirmados = usuarioLogado.alterarCurso(cursos);
+                            System.out
+                                    .println("\nATENÇÃO: ao alterar seu curso, sua matrícula também vai ser alterada!");
+                            System.out.println("Você tem certeza que quer alterar seu curso? (S/n)");
+                            alterarCurso = lerRespostaSimNao(alterarCurso);
+
+                            if (alterarCurso == 'S') {
+                                imprimirListaCursos(cursos);
+                                dadosConfirmados = usuarioLogado.alterarCurso(cursos);
+                            }
                             break;
                         case 4: // Voltar ao menu.
                             break;
@@ -241,7 +260,7 @@ public class App {
                     }
 
                     // Evitar que ele imprima os dados.
-                    if (!dadosConfirmados) {
+                    if (!dadosConfirmados && alterarCurso == 'n') {
                         break;
                     }
 
@@ -259,11 +278,13 @@ public class App {
                     // Só é permitido um empréstimo por usuário.
                     if (usuarioLogado.fezEmprestimo(emprestimos)) {
                         System.out.println("\nEncontramos um emprestimo em seu nome.");
-                        System.out.println("Só é permitido um emprestimo de exemplar por usuário.");
-                        System.out.println("Por favor, espere o prazo acabar ou faça a devolução do exemplar.\n");
+                        System.out.println("Só é permitido um emprestimo de exemplar por usuário!");
+                        System.out.println("Por favor, espere o prazo acabar ou faça a devolução do exemplar.");
+                        break;
                     }
 
-                    char escolherLivroOpcao = ' ';
+                    char escolherLivroOpcao = 'n';
+                    boolean exemplarDisponivel = true;
 
                     List<String[]> linhasTabelaLivros = new ArrayList<>();
                     linhasTabelaLivros.add(
@@ -311,6 +332,9 @@ public class App {
                         if (exemplarRequerido.getStatus() != "Livre") {
                             System.out.println("\nLivro indisponível. Deseja escolher outro? (S/n)");
                             escolherLivroOpcao = lerRespostaSimNao(escolherLivroOpcao);
+                            exemplarDisponivel = false;
+                        } else {
+                            exemplarDisponivel = true;
                         }
 
                         if (escolherLivroOpcao == 'n') {
@@ -318,9 +342,14 @@ public class App {
                         }
                     } while (escolherLivroOpcao == 'S');
 
-                    exemplarRequerido.emprestar();
-                    Emprestimo novoEmprestimo = new Emprestimo(usuarioLogado, exemplarRequerido);
-                    emprestimos.put(usuarioLogado.getCodigo(), novoEmprestimo);
+                    if (exemplarDisponivel) {
+                        exemplarRequerido.emprestar();
+
+                        Emprestimo novoEmprestimo = new Emprestimo(usuarioLogado, exemplarRequerido);
+                        emprestimos.put(usuarioLogado.getCodigo(), novoEmprestimo);
+
+                        System.out.println("\nEmprestimo feito com sucesso!");
+                    }
                     break;
 
                 // Dados do empréstimo.
@@ -362,6 +391,30 @@ public class App {
                         System.out.println("\nVocê não tem emprestimos cadastrados em seu nome.");
                         break;
                     }
+
+                    char opcaoDevolucao = 'n';
+                    Emprestimo emprestimoAtual = emprestimos.get(usuarioLogado.getCodigo());
+                    int diasRestantes = Period
+                            .between(emprestimoAtual.getDataEmprestimo(), emprestimoAtual.getDataDevolucao()).getDays();
+
+                    if (diasRestantes > 1) {
+                        System.out.printf("\nFaltam %d dias para o prazo padrão de devolução.\n", diasRestantes);
+                    } else {
+                        System.out.printf("\nFalta %d dia para o prazo padrão de devolução.\n", diasRestantes);
+                    }
+                    System.out.printf("Deseja fazer a devolução do exemplar de %s (Código: %d)? (S/n)\n",
+                            emprestimoAtual.getExemplar().getLivro().getTitulo(),
+                            emprestimoAtual.getExemplar().getCodigo());
+                    opcaoDevolucao = lerRespostaSimNao(opcaoDevolucao);
+
+                    if (opcaoDevolucao == 'S') {
+                        emprestimoAtual.getExemplar().devolver();
+                        emprestimos.remove(usuarioLogado.getCodigo());
+
+                        System.out.println("\nDevolução feita com sucesso!");
+                        System.out.println("Agora você pode fazer emprestimo de outro exemplar.");
+                    }
+
                     break;
 
                 // Logout
@@ -398,10 +451,10 @@ public class App {
                             usuarioLogado.getCurso().getModalidade());
 
                     if (usuarioLogado.fezEmprestimo(emprestimos)) {
-                        Livro livroEmprestimo = emprestimos.get(usuarioLogado.getCodigo()).getExemplar().getLivro();
+                        Exemplar exemplarEmprestimo = emprestimos.get(usuarioLogado.getCodigo()).getExemplar();
 
-                        System.out.printf("Exemplar emprestado: %s (Código: %d)\n", livroEmprestimo.getTitulo(),
-                                livroEmprestimo.getCodigo());
+                        System.out.printf("Exemplar: %s (Código: %d)\n", exemplarEmprestimo.getLivro().getTitulo(),
+                                exemplarEmprestimo.getCodigo());
                     }
 
                     break;

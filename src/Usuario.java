@@ -104,16 +104,16 @@ public class Usuario {
         char opcaoNovoNome = 'n';
         boolean nomeValido = false;
 
-        while (!nomeValido) {            
+        while (!nomeValido) {
             System.out.println("\nNovo nome do usuário:");
             novoNome = scanner.nextLine();
             novoNome = capitalizarTexto(novoNome);
-    
+
             if (novoNome.equals(this.nome)) {
                 System.out.println("\nVocê digitou mesmo nome de usuário que está cadastrado na sua conta.");
                 System.out.println("Deseja digitar outro nome? (S/n)");
                 opcaoNovoNome = lerRespostaSimNao(opcaoNovoNome);
-    
+
                 if (opcaoNovoNome == 'S') {
                     continue;
                 } else {
@@ -147,11 +147,9 @@ public class Usuario {
 
             System.out.println("\nNova senha:");
             novaSenha = validarSenha(8);
-            System.out.println(novaSenha);
 
             System.out.println("\nConfirmar senha:");
             senhaConfirmacao = validarSenha(8);
-            System.out.println(senhaConfirmacao);
 
             if (!novaSenha.equals(senhaConfirmacao)) {
                 senhaValidada = false;
@@ -211,6 +209,7 @@ public class Usuario {
         }
 
         this.curso = novoCurso;
+        this.matricula = gerarMatricula(); // Quando o curso é alterado, a matricula do usuário também deve mudar.
         return cursoValidado;
     }
 

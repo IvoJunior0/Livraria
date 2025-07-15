@@ -32,6 +32,11 @@ public class Exemplar {
         this.status = "Emprestado";
     }
 
+    public void devolver() {
+        this.getLivro().atualizarEstoque(1);
+        this.status = "Livre";
+    }
+
     public Livro getLivro() {
         return this.livro;
     }

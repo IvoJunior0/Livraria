@@ -39,13 +39,14 @@ public class Curso {
      */
     private String gerarCodigo(String nomeCurso) {
         // Retirando os acentos do nome do curso.
-        nomeCurso = Normalizer.normalize(nomeCurso, Normalizer.Form.NFD)
-                .replaceAll("\\p{InCombiningDiacriticalMarks}", "");
+        nomeCurso = Normalizer.normalize(nomeCurso, Normalizer.Form.NFD).replaceAll("\\p{InCombiningDiacriticalMarks}",
+                "");
 
         // Se for somente uma palavra.
         if (!nomeCurso.contains(" ")) {
             return nomeCurso.substring(0, 3).toUpperCase();
         }
+
         int espacoIndex = nomeCurso.indexOf(" ");
 
         String primeroTermo = nomeCurso.substring(0, 2).toUpperCase();
