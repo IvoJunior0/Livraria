@@ -4,6 +4,14 @@ public class Exemplar {
     private String status;
     private Livro livro;
 
+    /**
+     * Construtor da classe Exemplar.
+     * 
+     * O código do exemplar é gerado automaticamente com base na quantidade total de
+     * exemplares já criados no sistema.
+     * 
+     * @param livro Livro referente ao exemplar.
+     */
     public Exemplar(Livro livro) {
         this.codigo = ++quantidadeTotalExemplares;
         this.status = "Livre";

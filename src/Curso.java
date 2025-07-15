@@ -5,9 +5,9 @@ public class Curso {
 
     /**
      * Construtor da classe Curso.
-     * O código do curso é gerado automaticamente pela função gerarCodigo().
+     * O código do curso é sua sigla gerada automaticamente no mento da instância.
      * 
-     * @param nome Nome completo do curso.
+     * @param nome       Nome completo do curso.
      * @param modalidade Modalidade do curso.
      */
     public Curso(String nome, String modalidade) {
@@ -18,11 +18,12 @@ public class Curso {
 
     /**
      * Função que gera o código do curso baseado no nome dele.
-     * 1º -> Ela usa como base as três primeiras letras do nome e deixa todas em maiúsculo por padrão.
+     * 1º -> Ela usa como base as três primeiras letras do nome e deixa todas em
+     * maiúsculo por padrão.
      * 
      * 2º -> Se o nome do curso tiver mais de uma palavra:
-     *       - Usa as duas primeiras letras do primeiro termo.
-     *       - Junta com com a primeira letra do segundo.
+     * - Usa as duas primeiras letras do primeiro termo.
+     * - Junta com com a primeira letra do segundo.
      * 
      * Exemplo:
      * nomeCurso = "Informática";
@@ -41,7 +42,7 @@ public class Curso {
         }
         int espacoIndex = nomeCurso.indexOf(" ");
         String primeroTermo = nomeCurso.substring(0, 2).toUpperCase();
-        String segundoTermo = nomeCurso.substring(espacoIndex+1, espacoIndex+2).toUpperCase();
+        String segundoTermo = nomeCurso.substring(espacoIndex + 1, espacoIndex + 2).toUpperCase();
         return primeroTermo + segundoTermo;
     }
 
@@ -52,7 +53,7 @@ public class Curso {
     public String getNome() {
         return this.nome;
     }
-    
+
     public String getModalidade() {
         return this.modalidade;
     }

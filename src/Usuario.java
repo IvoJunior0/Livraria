@@ -20,7 +20,7 @@ public class Usuario {
      * Construtor de Usuario com parâmetros.
      * Usado para instância de contas estáticas do sistema.
      * 
-     * @param nome Nome a ser cadastrado.
+     * @param nome  Nome a ser cadastrado.
      * @param curso Curso a ser cadastrado.
      * @param senha Senha a ser cadastrada.
      */
@@ -36,7 +36,7 @@ public class Usuario {
      * Função de cadastro de usuário.
      * Usada para cadastro, implementação de novos dados e atualização de atributos.
      * 
-     * @param nome Nome a ser cadastrado.
+     * @param nome  Nome a ser cadastrado.
      * @param curso Curso a ser cadastrado.
      * @param senha Senha a ser cadastrada.
      */
@@ -55,7 +55,8 @@ public class Usuario {
      * O código do aluno é formatado em um string de 4 digitos decimais.
      * 
      * Exemplo:
-     * O primeiro aluno é matriculado em informática e terá código do curso INF e código 1.
+     * O primeiro aluno é matriculado em informática e terá código do curso INF e
+     * código 1.
      * INF + 1 = INF0001
      * 
      * @return String - Matricula formatada do aluno.
@@ -68,7 +69,8 @@ public class Usuario {
 
     /**
      * Método que verifica se a senha digita é igual a senha do usuário.
-     * Garantir que o cliente não tenha acesso direto a senha do usuário, mas possa saber se a senha digitada está correta.
+     * Garantir que o cliente não tenha acesso direto a senha do usuário, mas possa
+     * saber se a senha digitada está correta.
      * 
      * @param senhaDigitada Senha para verificação.
      * @return boolean - Se a senha digitada é igual a senha do usuário.
@@ -98,15 +100,32 @@ public class Usuario {
      */
     public boolean alterarNome() {
         Scanner scanner = new Scanner(System.in);
-        String novoNome;
+        String novoNome = "";
+        char opcaoNovoNome = 'n';
+        boolean nomeValido = false;
 
-        System.out.println("\nNome do usuário:");
-        novoNome = scanner.nextLine();
-        novoNome = capitalizarTexto(novoNome);
-        // TODO: se o novo curso escolhido for igual ao já cadastrado, pedir para o usuário escolher outro curso.
+        while (!nomeValido) {            
+            System.out.println("\nNovo nome do usuário:");
+            novoNome = scanner.nextLine();
+            novoNome = capitalizarTexto(novoNome);
+    
+            if (novoNome.equals(this.nome)) {
+                System.out.println("\nVocê digitou mesmo nome de usuário que está cadastrado na sua conta.");
+                System.out.println("Deseja digitar outro nome? (S/n)");
+                opcaoNovoNome = lerRespostaSimNao(opcaoNovoNome);
+    
+                if (opcaoNovoNome == 'S') {
+                    continue;
+                } else {
+                    break;
+                }
+            }
+
+            nomeValido = true;
+        }
 
         this.nome = novoNome;
-        return true;
+        return nomeValido;
     }
 
     /**
@@ -123,23 +142,23 @@ public class Usuario {
         String novaSenha = "", senhaConfirmacao;
         boolean senhaValidada = false;
         char tentarNovamente = ' ';
-        
+
         while (!senhaValidada || tentarNovamente == 'S') {
-            
+
             System.out.println("\nNova senha:");
             novaSenha = validarSenha(8);
             System.out.println(novaSenha);
-            
+
             System.out.println("\nConfirmar senha:");
             senhaConfirmacao = validarSenha(8);
             System.out.println(senhaConfirmacao);
-            
+
             if (!novaSenha.equals(senhaConfirmacao)) {
                 senhaValidada = false;
 
                 System.out.println("\nSenha não foi confirmada. Houve erro de digitação.");
                 System.out.println("Deseja tentar novamente? (S/n)");
-                
+
                 tentarNovamente = lerRespostaSimNao(tentarNovamente);
             } else {
                 tentarNovamente = 'n';
@@ -148,7 +167,7 @@ public class Usuario {
             }
 
             // scanner.nextLine(); // Limpando buffer.
-            
+
             // Se ele não quiser digitar outra senha.
             if (tentarNovamente == 'n') {
                 return false;
@@ -168,21 +187,39 @@ public class Usuario {
      */
     public boolean alterarCurso(List<Curso> listaCursos) {
         Scanner scanner = new Scanner(System.in);
-        Curso novoCurso;
-        
-        System.out.println("Selecione seu curso:");
-        novoCurso = validarOpcaoLista(listaCursos);
-        // TODO: se o novo curso escolhido for igual ao já cadastrado, pedir para o usuário escolher outro curso.
+        Curso novoCurso = null;
+        char opcaoCurso = 'n';
+        boolean cursoValidado = false;
+
+        while (!cursoValidado) {
+            System.out.println("Selecione seu curso:");
+            novoCurso = validarOpcaoLista(listaCursos);
+
+            if (novoCurso == this.curso) {
+                System.out.println("\nVocê escolheu o mesmo curso que está cadastrado na sua conta.");
+                System.out.println("Deseja escolher outro curso? (S/n)");
+                opcaoCurso = lerRespostaSimNao(opcaoCurso);
+
+                if (opcaoCurso == 'S') {
+                    continue;
+                } else {
+                    break;
+                }
+            }
+
+            cursoValidado = true;
+        }
 
         this.curso = novoCurso;
-        return true;
+        return cursoValidado;
     }
 
     /**
      * Método de capitalização de textos.
      * 
      * O texto é dividido em palavras com base em espaços usando regex.
-     * Em seguida, cada palavra tem seu primeiro caractere convertido para maiúsculo e é
+     * Em seguida, cada palavra tem seu primeiro caractere convertido para maiúsculo
+     * e é
      * concatenada ao resultado final.
      * 
      * Exemplo: "joão gabriel" torna-se "João Gabriel".
@@ -197,12 +234,11 @@ public class Usuario {
         for (int i = 0; i < palavras.length; i++) {
             String palavra = palavras[i];
             if (!palavra.isEmpty()) {
-                novoTexto.append( palavra.substring(0, 1).toUpperCase() + palavra.substring(1)
-                );
+                novoTexto.append(palavra.substring(0, 1).toUpperCase() + palavra.substring(1));
                 if (i < palavras.length - 1) {
                     // Evitar que adicione espaço na última palavra
                     // para que não fique "João Gabriel "
-                    novoTexto.append(" "); 
+                    novoTexto.append(" ");
                 }
             }
         }
@@ -231,7 +267,7 @@ public class Usuario {
 
         return lista.get(opcao - 1);
     }
-    
+
     /**
      * Método de validação de senhas.
      * Entra em loop enquanto a senha não tiver um tamanho mínimo aceito.
@@ -267,7 +303,7 @@ public class Usuario {
         } while (opcao != 'S' && opcao != 'n');
         return opcao;
     }
-    
+
     public int getCodigo() {
         return this.codigo;
     }

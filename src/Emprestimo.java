@@ -2,6 +2,8 @@ import java.time.LocalDate;
 
 public class Emprestimo {
     private static int totalDiasEmprestimo = 15;
+    private static int totalEmprestimos = 0;
+    private int codigo;
     private Usuario aluno;
     private Exemplar exemplar;
     private LocalDate dataEmprestimo;
@@ -13,10 +15,11 @@ public class Emprestimo {
      * A data do emprestimo é calculada automaticamente,
      * assim como a data da devolução do exemplar.
      * 
-     * @param aluno Objeto do usuário.
+     * @param aluno    Objeto do usuário.
      * @param exemplar Objeto do exemplar.
      */
     public Emprestimo(Usuario aluno, Exemplar exemplar) {
+        this.codigo = ++totalEmprestimos;
         this.aluno = aluno;
         this.exemplar = exemplar;
         this.dataEmprestimo = LocalDate.now();
@@ -30,6 +33,10 @@ public class Emprestimo {
 
     public static int getTotalDiasEmprestimo() {
         return Emprestimo.totalDiasEmprestimo;
+    }
+
+    public int getCodigo() {
+        return this.codigo;
     }
 
     public Usuario getAluno() {

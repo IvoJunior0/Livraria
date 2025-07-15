@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ArrayList;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
 public class App {
@@ -34,12 +35,13 @@ public class App {
         ArrayList<Usuario> usuariosCadastrados = new ArrayList<>(
                 Arrays.asList(
                         // Usuário estático para testes e afins.
-                        new Usuario("Ivo dos Santos Soares Junior", cursos.get(0), "12345678"))); // Os codigos dos
+                        new Usuario("Ivo Dos Santos Soares Junior", cursos.get(0), "12345678"))); // Os codigos dos
                                                                                                   // usuários serão
                                                                                                   // usados como
                                                                                                   // indexes.
         // Referência ao objeto das credenciais que o usuário escolher na hora do login.
-        // A variável logado serve como um checkout rápido para saber se o ponteiro aponta para algum objeto Usuário.
+        // A variável logado serve como um checkout rápido para saber se o ponteiro
+        // aponta para algum objeto Usuário.
         Usuario usuarioLogado = new Usuario();
 
         List<Livro> livros = Arrays.asList(
@@ -47,9 +49,9 @@ public class App {
                 new Livro("A hora da estrela", "Clarice Lispector", "Edição comemorativa", 2020, 88));
 
         List<Exemplar> exemplares = Arrays.asList(
-            new Exemplar(livros.get(0)), // Exemplar de "Capitaes da areia".
-            new Exemplar(livros.get(0)), 
-            new Exemplar(livros.get(1)) // Exemplar de "A hora da estrela".
+                new Exemplar(livros.get(0)), // Exemplar de "Capitaes da areia".
+                new Exemplar(livros.get(0)),
+                new Exemplar(livros.get(1)) // Exemplar de "A hora da estrela".
         );
 
         // HashMap da lista de emprestimos relacionados aos usuários.
@@ -78,12 +80,12 @@ public class App {
             System.out.println("\n1. Fazer cadastro");
             System.out.println("2. Login");
             System.out.println("3. Alterar dados do usuário");
-            System.out.println("4. Fazer emprestimo");
-            System.out.println("5. Dados detalhados do emprestimo");
+            System.out.println("4. Fazer empréstimo");
+            System.out.println("5. Dados detalhados do empréstimo");
             System.out.println("6. Fazer devolução");
             System.out.println("7. Logout");
             System.out.println("8. Perfil do usuário");
-            System.out.println("9. Mostrar emprestimos ativos");
+            System.out.println("9. Mostrar empréstimos ativos");
             System.out.println("10. Sair do sistema");
 
             System.out.println("Qual operação você deseja fazer?");
@@ -117,7 +119,8 @@ public class App {
                         System.out.println("\nUsuário a ser cadastrado:");
                         System.out.printf("- Nome: %s\n", usuarioNome);
                         System.out.printf("- Senha: %s\n", usuarioSenha);
-                        System.out.printf("- Curso: %s (%s)\n", cursoEscolhido.getNome(), cursoEscolhido.getModalidade());
+                        System.out.printf("- Curso: %s (%s)\n", cursoEscolhido.getNome(),
+                                cursoEscolhido.getModalidade());
                         System.out.println("\nConfirmar dados: (S/n)");
                         confimarDados = lerRespostaSimNao(confimarDados);
 
@@ -136,9 +139,9 @@ public class App {
                     }
 
                     // Somente se os dados forem confirmados. Se não, ele só volta pro menu.
-                    if (confimarDados == 'S') {                        
+                    if (confimarDados == 'S') {
                         user.cadastrarUsuario(usuarioNome, cursoEscolhido, usuarioSenha);
-    
+
                         System.out.printf("Usuário %s cadastrado com sucesso!\n", user.getNome());
                         imprimirDadosUsuario(user);
                         usuariosCadastrados.add(user);
@@ -170,7 +173,6 @@ public class App {
                         scanner.nextLine(); // Limpando buffer.
                     }
 
-                    
                     // Usuário continuará deslogado enquanto as credenciais estiverem erradas
                     while (!logado) {
                         String matriculaLogin, senhaLogin;
@@ -234,7 +236,7 @@ public class App {
                         case 4: // Voltar ao menu.
                             break;
                         default:
-                            System.out.println("\nOpção inválida");
+                            System.out.println("\n-> Opção inválida");
                             break;
                     }
 
@@ -247,14 +249,14 @@ public class App {
                     imprimirDadosUsuario(usuarioLogado);
                     break;
 
-                // Fazer emprestimo.
+                // Fazer empréstimo.
                 case 4:
                     if (!logado) {
-                        System.out.println("\nVocê precisa estar logado para acessar essa funcionalidade.");
+                        System.out.println("\n-> Você precisa estar logado para acessar essa funcionalidade.");
                         break;
                     }
 
-                    // Só é permitido um emprestimo por usuário.
+                    // Só é permitido um empréstimo por usuário.
                     if (usuarioLogado.fezEmprestimo(emprestimos)) {
                         System.out.println("\nEncontramos um emprestimo em seu nome.");
                         System.out.println("Só é permitido um emprestimo de exemplar por usuário.");
@@ -264,29 +266,33 @@ public class App {
                     char escolherLivroOpcao = ' ';
 
                     List<String[]> linhasTabelaLivros = new ArrayList<>();
-                    linhasTabelaLivros.add(new String[]{"Código", "Título (Autor)", "Edição (Ano)", "Nº de Páginas", "Estoque"}); // Primeira linha da tabela.
+                    linhasTabelaLivros.add(
+                            new String[] { "Código", "Título (Autor)", "Edição (Ano)", "Nº de Páginas", "Estoque" }); // Primeira
+                                                                                                                      // linha
+                                                                                                                      // da
+                                                                                                                      // tabela.
 
                     // Iteração para armazenar o valor da linha de cada item da lista livros.
                     for (Livro livro : livros) { // As outras linhas da tabela.
-                        linhasTabelaLivros.add(new String[]{
-                            String.valueOf(livro.getCodigo()),
-                            livro.getTitulo() + " (" + livro.getAutor() + ")",
-                            livro.getEdicao() + " (" + livro.getAno() + ")",
-                            livro.getNumeroPaginas() + " Páginas",
-                            "Disponíveis: " + livro.getEstoque()
+                        linhasTabelaLivros.add(new String[] {
+                                String.valueOf(livro.getCodigo()),
+                                livro.getTitulo() + " (" + livro.getAutor() + ")",
+                                livro.getEdicao() + " (" + livro.getAno() + ")",
+                                livro.getNumeroPaginas() + " Páginas",
+                                "Disponíveis: " + livro.getEstoque()
                         });
                     }
 
                     imprimirTabela(linhasTabelaLivros);
-                    
+
                     List<String[]> linhasTabelaExemplares = new ArrayList<>();
-                    linhasTabelaExemplares.add(new String[]{"Código", "Título", "Status"});
+                    linhasTabelaExemplares.add(new String[] { "Código", "Título", "Status" });
 
                     for (Exemplar exemplar : exemplares) {
-                        linhasTabelaExemplares.add(new String[]{
-                            String.valueOf(exemplar.getCodigo()),
-                            exemplar.getLivro().getTitulo(),
-                            exemplar.getStatus()
+                        linhasTabelaExemplares.add(new String[] {
+                                String.valueOf(exemplar.getCodigo()),
+                                exemplar.getLivro().getTitulo(),
+                                exemplar.getStatus()
                         });
                     }
 
@@ -295,31 +301,32 @@ public class App {
                     Exemplar exemplarRequerido; // Referência ao exemplar escolhido, não uma cópia dele.
                     // Repetir até a pessoa escolher um livro disponível.
                     do {
-                        escolherLivroOpcao = 'n'; // Por padrão a respota vai ser não para escolher outro livro em todo novo loop.
+                        escolherLivroOpcao = 'n'; // Por padrão a respota vai ser não para escolher outro livro em todo
+                                                  // novo loop.
 
                         System.out.println("Qual exemplar você deseja? (Digite o código)");
                         exemplarRequerido = validarOpcaoLista(exemplares);
-                        
+
                         // Checar se tá disponível.
                         if (exemplarRequerido.getStatus() != "Livre") {
                             System.out.println("\nLivro indisponível. Deseja escolher outro? (S/n)");
                             escolherLivroOpcao = lerRespostaSimNao(escolherLivroOpcao);
                         }
-                        
+
                         if (escolherLivroOpcao == 'n') {
                             break;
                         }
                     } while (escolherLivroOpcao == 'S');
 
                     exemplarRequerido.emprestar();
-                    Emprestimo emprestimo = new Emprestimo(usuarioLogado, exemplarRequerido);
-                    emprestimos.put(usuarioLogado.getCodigo(), emprestimo);
+                    Emprestimo novoEmprestimo = new Emprestimo(usuarioLogado, exemplarRequerido);
+                    emprestimos.put(usuarioLogado.getCodigo(), novoEmprestimo);
                     break;
 
-                // Dados do emprestimo.
+                // Dados do empréstimo.
                 case 5:
                     if (!logado) {
-                        System.out.println("\nVocê precisa estar logado para acessar essa funcionalidade.");
+                        System.out.println("\n-> Você precisa estar logado para acessar essa funcionalidade.");
                         break;
                     }
 
@@ -330,18 +337,14 @@ public class App {
 
                     Emprestimo emprestimoUsuario = emprestimos.get(usuarioLogado.getCodigo());
 
-                    // Formatando as datas do emprestimo para o formato brasileiro: dia, mês e ano.
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/uuuu");
-                    String dataEmprestimo = emprestimoUsuario.getDataEmprestimo().format(formatter);
-                    String dataDevolucao = emprestimoUsuario.getDataDevolucao().format(formatter);
-
                     List<String[]> tabelaEmprestimo = new ArrayList<>();
-                    tabelaEmprestimo.add(new String[]{"Aluno", "Exemplar", "Data do empréstimo", "Data de devolução"});
-                    tabelaEmprestimo.add(new String[]{
-                        emprestimoUsuario.getAluno().getNome(),
-                        emprestimoUsuario.getExemplar().getLivro().getTitulo(),
-                        dataEmprestimo,
-                        dataDevolucao
+                    tabelaEmprestimo
+                            .add(new String[] { "Aluno", "Exemplar", "Data do empréstimo", "Data de devolução" });
+                    tabelaEmprestimo.add(new String[] {
+                            emprestimoUsuario.getAluno().getNome(),
+                            emprestimoUsuario.getExemplar().getLivro().getTitulo(),
+                            formatarData(emprestimoUsuario.getDataEmprestimo()),
+                            formatarData(emprestimoUsuario.getDataDevolucao())
                     });
 
                     System.out.println("\nDados do emprestimo:");
@@ -351,7 +354,7 @@ public class App {
                 // Fazer devolução.
                 case 6:
                     if (!logado) {
-                        System.out.println("\nVocê precisa estar logado para acessar essa funcionalidade.");
+                        System.out.println("\n-> Você precisa estar logado para acessar essa funcionalidade.");
                         break;
                     }
 
@@ -360,16 +363,17 @@ public class App {
                         break;
                     }
                     break;
-                
+
                 // Logout
                 case 7:
                     if (!logado) {
-                        System.out.println("\nVocê precisa estar logado para acessar essa funcionalidade.");
+                        System.out.println("\n-> Você precisa estar logado para acessar essa funcionalidade.");
                         break;
                     }
                     char opcaoLogout = ' ';
 
-                    System.out.printf("\nVocê tem certeza que deseja sair de sua conta, %s? (S/n)\n", usuarioLogado.getPrimeiroNome());
+                    System.out.printf("\nVocê tem certeza que deseja sair de sua conta, %s? (S/n)\n",
+                            usuarioLogado.getPrimeiroNome());
                     opcaoLogout = lerRespostaSimNao(opcaoLogout);
 
                     if (opcaoLogout == 'S') {
@@ -379,60 +383,88 @@ public class App {
                     }
 
                     break;
-                
+
                 // Perfil do usuário
                 case 8:
                     if (!logado) {
-                        System.out.println("\nVocê precisa estar logado para acessar essa funcionalidade.");
+                        System.out.println("\n-> Você precisa estar logado para acessar essa funcionalidade.");
                         break;
                     }
 
                     System.out.printf("\n=== PERFIL DE %s ===\n", usuarioLogado.getPrimeiroNome().toUpperCase());
-                    System.out.printf("-> Nome completo: %s\n", usuarioLogado.getNome());
-                    System.out.printf("-> Matricula: %s\n", usuarioLogado.getMatricula());
-                    System.out.printf("-> Curso: %s (%s)\n", usuarioLogado.getCurso().getNome(), usuarioLogado.getCurso().getModalidade());
+                    System.out.printf("Nome completo: %s\n", usuarioLogado.getNome());
+                    System.out.printf("Matricula: %s\n", usuarioLogado.getMatricula());
+                    System.out.printf("Curso: %s (%s)\n", usuarioLogado.getCurso().getNome(),
+                            usuarioLogado.getCurso().getModalidade());
 
                     if (usuarioLogado.fezEmprestimo(emprestimos)) {
                         Livro livroEmprestimo = emprestimos.get(usuarioLogado.getCodigo()).getExemplar().getLivro();
 
-                        System.out.printf("-> Exemplar emprestado: %s (Código: %d)\n", livroEmprestimo.getTitulo(), livroEmprestimo.getCodigo());
+                        System.out.printf("Exemplar emprestado: %s (Código: %d)\n", livroEmprestimo.getTitulo(),
+                                livroEmprestimo.getCodigo());
                     }
+
                     break;
-                
-                // Mostrar emprestimos ativos
+
+                // Mostrar empréstimos ativos
                 case 9:
+                    // Caso não tenha nenhum emprestimo para não imprimir só a primeira linha dos
+                    // atributos do emprestimo.
+                    if (emprestimos.size() == 0) {
+                        System.out.println("\nNenhum emprestimo foi cadastrado por nenhum usuário.");
+                        break;
+                    }
+
+                    List<String[]> linhasTabelaEmprestimos = new ArrayList<>();
+                    linhasTabelaEmprestimos.add(
+                            new String[] { "Código", "Aluno", "Exemplar", "Data do empréstimo", "Data de devolução" });
+
+                    for (Emprestimo emprestimo : emprestimos.values()) {
+                        linhasTabelaEmprestimos.add(new String[] {
+                                String.valueOf(emprestimo.getCodigo()),
+                                emprestimo.getAluno().getNome(),
+                                emprestimo.getExemplar().getLivro().getTitulo(),
+                                formatarData(emprestimo.getDataEmprestimo()),
+                                formatarData(emprestimo.getDataDevolucao())
+                        });
+                    }
+
+                    imprimirTabela(linhasTabelaEmprestimos);
                     break;
-                
+
                 // Sair do sistema.
                 case 10:
                     System.out.println("\nObrigado e volte sempre!");
                     break;
-                
+
                 default:
-                    System.out.println("\nOpção inválida");
+                    System.out.println("\n-> Opção inválida");
                     break;
             }
         }
     }
 
     public static void imprimirTabela(List<String[]> colunas) {
-        if (colunas.isEmpty()) return;
-        
+        if (colunas.isEmpty()) {
+            return;
+        }
+
         int quantidadeColunas = colunas.get(0).length; // o index 0 é referente ao valor tamanho mínimo das colunas.
         int[] tamanhoColunas = new int[quantidadeColunas]; // Armazena o tamanho a ser impresso de cada coluna.
-        
+
         // Calcular o tamanho máximo por coluna.
         for (String[] coluna : colunas) {
             for (int i = 0; i < quantidadeColunas; i++) {
                 tamanhoColunas[i] = Math.max(tamanhoColunas[i], coluna[i].length());
             }
         }
-        
+
         // Imprimir linha horizontal.
         StringBuilder horizontal = new StringBuilder("+");
-        for (int tamanho : tamanhoColunas) horizontal.append("-".repeat(tamanho + 2)).append("+");
+        for (int tamanho : tamanhoColunas)
+            horizontal.append("-".repeat(tamanho + 2)).append("+");
         String linhaHorizontal = horizontal.toString();
-        
+
         // Linha cabeçalho
         System.out.println();
         System.out.println(linhaHorizontal);
@@ -442,7 +474,7 @@ public class App {
             String[] linha = colunas.get(r);
             System.out.print("|");
             for (int i = 0; i < quantidadeColunas; i++) {
-                System.out.printf(" %-"+tamanhoColunas[i]+"s |", linha[i]);
+                System.out.printf(" %-" + tamanhoColunas[i] + "s |", linha[i]);
             }
             System.out.println();
             System.out.println(linhaHorizontal); // Linha que fica entre as linhas.
@@ -465,7 +497,8 @@ public class App {
      * Método de capitalização de textos.
      * 
      * O texto é dividido em palavras com base em espaços usando regex.
-     * Em seguida, cada palavra tem seu primeiro caractere convertido para maiúsculo e é
+     * Em seguida, cada palavra tem seu primeiro caractere convertido para maiúsculo
+     * e é
      * concatenada ao resultado final.
      * 
      * Exemplo: "joão gabriel" torna-se "João Gabriel".
@@ -481,13 +514,12 @@ public class App {
             String palavra = palavras[i];
             if (!palavra.isEmpty()) {
                 novoTexto.append(
-                    palavra.substring(0, 1).toUpperCase()
-                    + palavra.substring(1)
-                );
+                        palavra.substring(0, 1).toUpperCase()
+                                + palavra.substring(1));
                 if (i < palavras.length - 1) {
                     // Evitar que adicione espaço na última palavra
                     // para que não fique "João Gabriel "
-                    novoTexto.append(" "); 
+                    novoTexto.append(" ");
                 }
             }
         }
@@ -518,7 +550,8 @@ public class App {
 
     /**
      * Método de validação de opção.
-     * Entra em loop enquanto a opção escolhida for negativa ou maior que o número de opções.
+     * Entra em loop enquanto a opção escolhida for negativa ou maior que o número
+     * de opções.
      * 
      * @param numeroOpcoes Número de opções disponíveis.
      * @return int - Opção válida.
@@ -528,7 +561,7 @@ public class App {
         do {
             opcao = scanner.nextInt();
             if (opcao < 1 || opcao > numeroOpcoes) {
-                System.out.println("\nOpção inválida!");
+                System.out.println("\n-> Opção inválida!");
                 System.out.println("Por favor, digite escolha outra:");
             }
         } while (opcao < 1 || opcao > numeroOpcoes);
@@ -566,7 +599,7 @@ public class App {
         do {
             opcao = scanner.nextInt();
             if (opcao < 1 || opcao > lista.size()) {
-                System.out.println("\nOpção inválida!");
+                System.out.println("\n-> Opção inválida!");
                 System.out.println("Por favor, escolha uma que esteja dentro da lista:");
             }
         } while (opcao < 1 || opcao > lista.size());
@@ -584,9 +617,22 @@ public class App {
         do {
             opcao = scanner.next().charAt(0);
             if (opcao != 'S' && opcao != 'n') {
-                System.out.println("Opção inválida. Digita novamente.");
+                System.out.println("-> Opção inválida. Digita novamente.");
             }
         } while (opcao != 'S' && opcao != 'n');
         return opcao;
+    }
+
+    /**
+     * Método de formatação de datas no padrão dia - mês - ano.
+     * Trabalha com datas sem horários.
+     * 
+     * @param data Data a ser formatada.
+     * @return String - Data formatada (padrão dd/mm/yyyy).
+     */
+    public static String formatarData(LocalDate data) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/uuuu");
+
+        return data.format(formatter);
     }
 }
